@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T00:00:00.000Z",
+  "title": "Design System: Album Sort",
+  "extensions": {
+    "colorMeta": {
+      "amethyst": { "role": "primary", "displayName": "Amethyst", "canonical": "oklch(0.72 0.19 295)", "tonalRamp": ["oklch(0.15 0.19 295)", "oklch(0.25 0.19 295)", "oklch(0.36 0.19 295)", "oklch(0.48 0.19 295)", "oklch(0.6 0.19 295)", "oklch(0.72 0.19 295)", "oklch(0.83 0.12 295)", "oklch(0.93 0.05 295)"] },
+      "amethyst-ink": { "role": "primary", "displayName": "Amethyst Ink", "canonical": "oklch(0.12 0.02 295)", "tonalRamp": ["oklch(0.08 0.02 295)", "oklch(0.12 0.02 295)", "oklch(0.2 0.02 295)", "oklch(0.3 0.02 295)", "oklch(0.45 0.02 295)", "oklch(0.6 0.02 295)", "oklch(0.78 0.02 295)", "oklch(0.93 0.02 295)"] },
+      "graphite-violet": { "role": "neutral", "displayName": "Graphite Violet", "canonical": "oklch(0.13 0.012 285)", "tonalRamp": ["oklch(0.1 0.012 285)", "oklch(0.13 0.012 285)", "oklch(0.18 0.015 285)", "oklch(0.27 0.012 285)", "oklch(0.4 0.01 285)", "oklch(0.55 0.008 285)", "oklch(0.75 0.005 285)", "oklch(0.95 0.003 285)"] },
+      "graphite-card": { "role": "neutral", "displayName": "Graphite Card", "canonical": "oklch(0.18 0.015 285)", "tonalRamp": ["oklch(0.13 0.012 285)", "oklch(0.15 0.014 285)", "oklch(0.18 0.015 285)", "oklch(0.22 0.014 285)", "oklch(0.3 0.012 285)", "oklch(0.42 0.01 285)", "oklch(0.62 0.008 285)", "oklch(0.88 0.004 285)"] },
+      "graphite-raised": { "role": "neutral", "displayName": "Graphite Raised", "canonical": "oklch(0.269 0 0)", "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.2 0 0)", "oklch(0.269 0 0)", "oklch(0.34 0 0)", "oklch(0.44 0 0)", "oklch(0.58 0 0)", "oklch(0.78 0 0)", "oklch(0.94 0 0)"] },
+      "graphite-popover": { "role": "neutral", "displayName": "Graphite Popover", "canonical": "oklch(0.205 0 0)", "tonalRamp": ["oklch(0.12 0 0)", "oklch(0.16 0 0)", "oklch(0.205 0 0)", "oklch(0.26 0 0)", "oklch(0.36 0 0)", "oklch(0.5 0 0)", "oklch(0.74 0 0)", "oklch(0.93 0 0)"] },
+      "paper-white": { "role": "neutral", "displayName": "Paper White", "canonical": "oklch(0.985 0 0)", "tonalRamp": ["oklch(0.3 0 0)", "oklch(0.45 0 0)", "oklch(0.6 0 0)", "oklch(0.75 0 0)", "oklch(0.86 0 0)", "oklch(0.93 0 0)", "oklch(0.97 0 0)", "oklch(0.985 0 0)"] },
+      "ash": { "role": "neutral", "displayName": "Ash", "canonical": "oklch(0.708 0 0)", "tonalRamp": ["oklch(0.2 0 0)", "oklch(0.3 0 0)", "oklch(0.4 0 0)", "oklch(0.5 0 0)", "oklch(0.6 0 0)", "oklch(0.708 0 0)", "oklch(0.82 0 0)", "oklch(0.93 0 0)"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "oklch(1 0 0 / 10%)", "tonalRamp": ["oklch(1 0 0 / 3%)", "oklch(1 0 0 / 5%)", "oklch(1 0 0 / 8%)", "oklch(1 0 0 / 10%)", "oklch(1 0 0 / 15%)", "oklch(1 0 0 / 20%)", "oklch(1 0 0 / 30%)", "oklch(1 0 0 / 50%)"] },
+      "field-line": { "role": "neutral", "displayName": "Field Line", "canonical": "oklch(1 0 0 / 15%)", "tonalRamp": ["oklch(1 0 0 / 3%)", "oklch(1 0 0 / 5%)", "oklch(1 0 0 / 10%)", "oklch(1 0 0 / 15%)", "oklch(1 0 0 / 20%)", "oklch(1 0 0 / 30%)", "oklch(1 0 0 / 40%)", "oklch(1 0 0 / 60%)"] },
+      "alarm": { "role": "tertiary", "displayName": "Alarm", "canonical": "oklch(0.704 0.191 22.216)", "tonalRamp": ["oklch(0.2 0.1 22)", "oklch(0.3 0.13 22)", "oklch(0.42 0.16 22)", "oklch(0.55 0.19 22)", "oklch(0.63 0.2 22)", "oklch(0.704 0.191 22)", "oklch(0.82 0.11 22)", "oklch(0.93 0.04 22)"] },
+      "crown-amber": { "role": "tertiary", "displayName": "Crown Amber", "canonical": "#fbbf24", "tonalRamp": ["oklch(0.25 0.06 85)", "oklch(0.4 0.09 85)", "oklch(0.55 0.12 85)", "oklch(0.7 0.15 85)", "oklch(0.82 0.16 85)", "oklch(0.86 0.17 85)", "oklch(0.92 0.1 85)", "oklch(0.97 0.04 85)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The Album Sort wordmark on the home page." },
+      "headline": { "displayName": "Headline", "purpose": "Group name and revealed album title." },
+      "title": { "displayName": "Title", "purpose": "Section headings." },
+      "body": { "displayName": "Body", "purpose": "Default text, lists, tracklist." },
+      "label": { "displayName": "Label", "purpose": "Badges, buttons and metadata." }
+    },
+    "shadows": [
+      { "name": "needle-glow", "value": "0 0 14px 2px var(--primary)", "purpose": "The roulette's center line." },
+      { "name": "winner-halo", "value": "0 0 32px -4px var(--primary)", "purpose": "The cover that stopped under the needle." },
+      { "name": "vote-halo", "value": "0 0 28px -6px var(--primary)", "purpose": "The vote tile the member chose." },
+      { "name": "cover-lift", "value": "0 25px 50px -12px color-mix(in oklch, var(--primary) 20%, transparent)", "purpose": "The revealed album cover." },
+      { "name": "disc-glow", "value": "0 0 60px -10px var(--primary)", "purpose": "The spinning disc on the home page." },
+      { "name": "menu-float", "value": "0 20px 25px -5px rgb(0 0 0 / 0.3)", "purpose": "The member options popover." }
+    ],
+    "motion": [
+      { "name": "roulette-decel", "value": "cubic-bezier(0.1, 0.75, 0.12, 1)", "purpose": "7s spin that accelerates fast and settles slowly." },
+      { "name": "spring-card", "value": "spring(stiffness 160, damping 18)", "purpose": "Album card reveal entrance." },
+      { "name": "spring-tile", "value": "spring(stiffness 180, damping 18)", "purpose": "Vote tile staggered entrance (80ms step)." },
+      { "name": "disc-spin", "value": "spin 5s linear infinite", "purpose": "The home page disc (6s in the group header)." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single leading action of a section.",
+      "html": "<button class=\"ds-btn-primary\">Iniciar rodada</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; background: oklch(0.72 0.19 295); color: oklch(0.12 0.02 295); font: 500 14px 'Geist Variable', sans-serif; cursor: pointer; transition: background 0.15s, transform 0.1s; } .ds-btn-primary:hover { background: oklch(0.72 0.19 295 / 0.8); } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.72 0.19 295 / 0.5); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Alternative action next to a primary one.",
+      "html": "<button class=\"ds-btn-secondary\">Sortear de novo</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; justify-content: center; height: 36px; padding: 0 12px; border: 1px solid transparent; border-radius: 10px; background: oklch(0.269 0 0); color: oklch(0.985 0 0); font: 500 14px 'Geist Variable', sans-serif; cursor: pointer; transition: background 0.15s; } .ds-btn-secondary:hover { background: color-mix(in oklch, oklch(0.269 0 0), oklch(0.985 0 0) 5%); } .ds-btn-secondary:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.72 0.19 295 / 0.5); }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Low-emphasis utility actions such as copying the invite link.",
+      "html": "<button class=\"ds-btn-outline\">Copiar convite</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; border: 1px solid oklch(1 0 0 / 15%); border-radius: 10px; background: oklch(1 0 0 / 4.5%); color: oklch(0.985 0 0); font: 500 14px 'Geist Variable', sans-serif; cursor: pointer; transition: background 0.15s; } .ds-btn-outline:hover { background: oklch(1 0 0 / 7.5%); } .ds-btn-outline:focus-visible { outline: none; border-color: oklch(0.72 0.19 295); box-shadow: 0 0 0 3px oklch(0.72 0.19 295 / 0.5); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Single-line field for group name, member name and Last.fm user.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nome do grupo\" />",
+      "css": ".ds-input { box-sizing: border-box; width: 100%; height: 32px; padding: 4px 10px; border: 1px solid oklch(1 0 0 / 15%); border-radius: 10px; background: oklch(1 0 0 / 4.5%); color: oklch(0.985 0 0); font: 400 14px 'Geist Variable', sans-serif; outline: none; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input::placeholder { color: oklch(0.708 0 0); } .ds-input:focus-visible { border-color: oklch(0.72 0.19 295); box-shadow: 0 0 0 3px oklch(0.72 0.19 295 / 0.5); }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Default container with a 1px translucent ring.",
+      "html": "<div class=\"ds-card\"><h2>Criar grupo</h2><p>Monte um grupo com os amigos.</p></div>",
+      "css": ".ds-card { padding: 16px; border-radius: 14px; background: oklch(0.18 0.015 285); color: oklch(0.985 0 0); box-shadow: 0 0 0 1px oklch(0.985 0 0 / 10%); font: 400 14px 'Geist Variable', sans-serif; } .ds-card h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; } .ds-card p { margin: 0; color: oklch(0.708 0 0); }"
+    },
+    {
+      "name": "Segmented Choice",
+      "kind": "chip",
+      "refersTo": "button-primary",
+      "description": "Two-up mode and kind selector; the selected option fills amethyst.",
+      "html": "<div class=\"ds-seg\"><button aria-pressed=\"true\">Sorteio</button><button aria-pressed=\"false\">Votação</button></div>",
+      "css": ".ds-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid oklch(1 0 0 / 10%); border-radius: 14px; background: oklch(0.13 0.012 285 / 0.4); } .ds-seg button { padding: 8px 12px; border: 0; border-radius: 10px; background: transparent; color: oklch(0.708 0 0); font: 500 14px 'Geist Variable', sans-serif; cursor: pointer; transition: color 0.15s, background 0.15s; } .ds-seg button:hover { color: oklch(0.985 0 0); } .ds-seg button[aria-pressed='true'] { background: oklch(0.72 0.19 295); color: oklch(0.12 0.02 295); } .ds-seg button:focus-visible { outline: none; box-shadow: 0 0 0 3px oklch(0.72 0.19 295 / 0.5); }"
+    },
+    {
+      "name": "Member Row",
+      "kind": "custom",
+      "refersTo": "member-row",
+      "description": "Member with initial avatar, leader crown and status badge.",
+      "html": "<div class=\"ds-member\"><span class=\"ds-avatar\">F</span><div class=\"ds-member-name\">Fernando <span class=\"ds-you\">(você)</span></div><span class=\"ds-badge\">Pronto</span></div>",
+      "css": ".ds-member { display: flex; align-items: center; gap: 12px; padding: 8px 12px; border: 1px solid oklch(1 0 0 / 10%); border-radius: 14px; background: oklch(0.18 0.015 285); color: oklch(0.985 0 0); font: 400 14px 'Geist Variable', sans-serif; } .ds-avatar { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9999px; background: oklch(0.72 0.19 295 / 0.15); color: oklch(0.72 0.19 295); font-weight: 600; } .ds-member-name { flex: 1; font-weight: 500; } .ds-you { font-size: 12px; font-weight: 400; color: oklch(0.708 0 0); } .ds-badge { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; border-radius: 9999px; background: oklch(0.72 0.19 295); color: oklch(0.12 0.02 295); font: 500 12px 'Geist Variable', sans-serif; }"
+    },
+    {
+      "name": "Vote Tile",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "Cover-forward candidate; the chosen one carries a ring, halo and tick.",
+      "html": "<button class=\"ds-vote\" aria-pressed=\"true\"><div class=\"ds-cover\"></div><div class=\"ds-vote-meta\"><p class=\"ds-vote-title\">Kind of Blue</p><p class=\"ds-vote-sub\">Miles Davis · 1959</p></div></button>",
+      "css": ".ds-vote { position: relative; display: block; width: 180px; padding: 0; overflow: hidden; border: 1px solid oklch(1 0 0 / 10%); border-radius: 14px; background: oklch(0.18 0.015 285); color: oklch(0.985 0 0); text-align: left; font-family: 'Geist Variable', sans-serif; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; } .ds-vote:hover { transform: translateY(-4px); } .ds-vote[aria-pressed='true'] { box-shadow: 0 0 0 2px oklch(0.72 0.19 295), 0 0 28px -6px oklch(0.72 0.19 295); } .ds-cover { aspect-ratio: 1; background: conic-gradient(from 200deg, oklch(0.35 0.1 260), oklch(0.5 0.14 300), oklch(0.3 0.08 250)); } .ds-vote-meta { padding: 10px; } .ds-vote-title { margin: 0; overflow: hidden; font-size: 14px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; } .ds-vote-sub { margin: 0; overflow: hidden; color: oklch(0.708 0 0); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Listening Room",
+    "overview": "A dark, quiet room where the album cover is the only light source. The interface is a low-lit graphite shell tinted faintly violet; everything that is not the music steps back. Color is rationed: a single amethyst accent marks the one thing that matters on a screen at that moment (the roulette needle, the leader's primary action, the vote you cast). Typography is plain and confident, one family, no ornament. The product's drama lives in the roulette and the reveal, not in the chrome around them.\n\nThe system is dark-only by design. It is built for phones held in a dim living room, at a gathering, with friends beside you. Density is comfortable and touch-sized; most screens are a single column of sections that never exceeds a 56rem reading width.",
+    "keyCharacteristics": [
+      "Dark graphite with a violet undertone (hue 285), never pure black and never a light mode.",
+      "One accent (amethyst, hue 295), used sparingly and with a glow only at moments of decision.",
+      "Covers are the imagery; ornament is almost nonexistent.",
+      "Flat, tonal surfaces with 1px translucent rings instead of drop shadows.",
+      "Rounded but not pillowy: 10px controls, 14px cards, 18px for the roulette frame.",
+      "Motion is spring-based and purposeful: entrances, the reveal, the vote tick."
+    ],
+    "rules": [
+      { "name": "The One Lamp Rule", "body": "Amethyst is the only accent. If two things on a screen are amethyst, one of them is wrong.", "section": "colors" },
+      { "name": "The Cover Is The Light Rule", "body": "Saturated color comes from album covers. The interface never competes with a cover for chroma.", "section": "colors" },
+      { "name": "The Numbers Align Rule", "body": "Durations and track numbers use tabular numerals so columns stay in line.", "section": "typography" },
+      { "name": "The Glow Is An Event Rule", "body": "A violet glow appears only when something has been decided or is being decided. Never on idle resting surfaces.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do let the album cover be the brightest, most colorful object on screen.",
+      "Do keep amethyst to one purpose per screen (The One Lamp Rule).",
+      "Do use the 14px / 10px radius pair and the 1px translucent ring for surfaces.",
+      "Do use springs for entrances and the 7s deceleration curve for the roulette; honor prefers-reduced-motion.",
+      "Do keep copy in informal Brazilian Portuguese with progressive verbs for waiting states.",
+      "Do keep the page single-column and phone-first, touch targets at least 32px."
+    ],
+    "donts": [
+      "Don't introduce a light theme, a second accent hue, or a gradient text treatment.",
+      "Don't add decorative glows to resting surfaces; glow marks a decision.",
+      "Don't use pure black or pure white backgrounds; stay on the violet-tinted graphite.",
+      "Don't add a second typeface or serif display for flavor.",
+      "Don't use identical icon-plus-heading-plus-blurb card grids; the product is sections and covers, not feature tiles.",
+      "Don't hide state: whose turn it is, who is ready, and who has voted must always be visible."
+    ]
+  }
+}
