@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/index.css"
+        ],
+        "createdAt": "2026-10-18T20:01:04.220Z",
+        "reason": "agent decision, not user confirmed: intentional 4px bottom edge is the physical thickness of a piano key or push button in the valve-radio world (seen in mobile captures, reads as a keycap, not a card accent)"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/components/VotePanel.tsx"
+        ],
+        "createdAt": "2026-10-18T20:01:04.454Z",
+        "reason": "agent decision, not user confirmed: intentional 4px bottom edge is the physical thickness of a piano key or push button in the valve-radio world (seen in mobile captures, reads as a keycap, not a card accent)"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/components/MemberList.tsx"
+        ],
+        "createdAt": "2026-10-18T20:01:04.715Z",
+        "reason": "agent decision, not user confirmed: intentional 4px bottom edge is the physical thickness of a piano key or push button in the valve-radio world (seen in mobile captures, reads as a keycap, not a card accent)"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/pages/Home.tsx"
+        ],
+        "createdAt": "2026-10-18T20:01:04.948Z",
+        "reason": "agent decision, not user confirmed: intentional 4px bottom edge is the physical thickness of a piano key or push button in the valve-radio world (seen in mobile captures, reads as a keycap, not a card accent)"
+      }
+    ]
+  }
+}

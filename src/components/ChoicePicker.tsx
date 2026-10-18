@@ -5,8 +5,8 @@ import { toast } from 'sonner'
 import genres from '@/data/genres.json'
 import { api } from '@/lib/api'
 import { artistAlbums, searchArtists } from '@/lib/musicbrainz'
+import { sfx } from '@/lib/sound'
 import type { Choice, Mode } from '@/lib/types'
-import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command'
 
@@ -53,7 +53,10 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
 
   const save = (next: Choice[], isReady: boolean) => {
     setItems(next)
-    api.setChoices(roundId, next, isReady).catch((e: Error) => toast.error(e.message))
+    api.setChoices(roundId, next, isReady).catch((e: Error) => {
+      sfx.error()
+      toast.error(e.message)
+    })
   }
 
   async function add(c: Choice) {
@@ -75,18 +78,19 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2 min-h-9">
+      <div className="flex min-h-11 flex-wrap gap-2">
         <AnimatePresence initial={false}>
           {items.map((c) => (
-            <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.7 }}>
-              <Badge variant="secondary" className="h-8 gap-1.5 pl-3 pr-1.5 text-sm">
+            <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+              <span className="flex h-11 items-center gap-1 rounded-sm border-[1.5px] border-foreground bg-foreground pl-3 text-base font-bold text-background">
                 {c.name}
                 {!locked && (
-                  <button aria-label={`Remover ${c.name}`} className="rounded-full p-0.5 hover:bg-background/60" onClick={() => save(items.filter((i) => i.id !== c.id), false)}>
-                    <X className="size-3.5" />
+                  <button aria-label={`Remover ${c.name}`} className="flex size-11 items-center justify-center hover:bg-background/15" onClick={() => save(items.filter((i) => i.id !== c.id), false)}>
+                    <X className="size-4" />
                   </button>
                 )}
-              </Badge>
+                {locked && <span className="w-3" />}
+              </span>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -99,7 +103,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
         </Button>
       ) : (
         <>
-          <Command shouldFilter={false} className="border">
+          <Command shouldFilter={false}>
             <CommandInput value={query} onValueChange={setQuery} placeholder={mode === 'artist' ? 'Buscar banda ou artista…' : 'Buscar gênero (ex.: post-rock, shoegaze)…'} disabled={items.length >= MAX} />
             {(query.trim().length >= 2 || options.length > 0) && (
               <CommandList>
@@ -111,13 +115,13 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
                 {options.map((o) => (
                   <CommandItem key={o.id} value={o.id} onSelect={() => add(o)}>
                     <span className="max-w-[60%] shrink-0 truncate">{o.name}</span>
-                    {o.sub && <span className="ml-2 min-w-0 truncate text-xs text-muted-foreground">{o.sub}</span>}
+                    {o.sub && <span className="ml-2 min-w-0 truncate text-xs opacity-70">{o.sub}</span>}
                   </CommandItem>
                 ))}
               </CommandList>
             )}
           </Command>
-          <Button disabled={items.length === 0 || !!checking} onClick={() => { setLocked(true); save(items, true) }}>
+          <Button size="lg" disabled={items.length === 0 || !!checking} onClick={() => { setLocked(true); save(items, true); sfx.ready() }}>
             <Check /> Confirmar escolhas ({items.length}/{MAX})
           </Button>
         </>

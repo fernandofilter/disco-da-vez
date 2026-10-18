@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-18T12:00:00.000Z",
+  "title": "Design System: Disco da Vez",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Cool Newsprint",
+        "canonical": "oklch(0.965 0.007 250)",
+        "tonalRamp": [
+          "oklch(0.15 0.007 250)",
+          "oklch(0.28 0.007 250)",
+          "oklch(0.4 0.007 250)",
+          "oklch(0.52 0.007 250)",
+          "oklch(0.64 0.007 250)",
+          "oklch(0.76 0.007 250)",
+          "oklch(0.86 0.007 250)",
+          "oklch(0.95 0.007 250)"
+        ]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Press Ink",
+        "canonical": "oklch(0.17 0.012 262)",
+        "tonalRamp": [
+          "oklch(0.15 0.012 262)",
+          "oklch(0.28 0.012 262)",
+          "oklch(0.4 0.012 262)",
+          "oklch(0.52 0.012 262)",
+          "oklch(0.64 0.012 262)",
+          "oklch(0.76 0.012 262)",
+          "oklch(0.86 0.012 262)",
+          "oklch(0.95 0.012 262)"
+        ]
+      },
+      "live": {
+        "role": "secondary",
+        "displayName": "Live Red",
+        "canonical": "oklch(0.58 0.22 27)",
+        "tonalRamp": [
+          "oklch(0.15 0.1 27)",
+          "oklch(0.28 0.15 27)",
+          "oklch(0.4 0.19 27)",
+          "oklch(0.52 0.22 27)",
+          "oklch(0.64 0.2 27)",
+          "oklch(0.76 0.14 27)",
+          "oklch(0.86 0.08 27)",
+          "oklch(0.95 0.03 27)"
+        ]
+      },
+      "you": {
+        "role": "secondary",
+        "displayName": "You Blue",
+        "canonical": "oklch(0.5 0.21 262)",
+        "tonalRamp": [
+          "oklch(0.15 0.1 262)",
+          "oklch(0.28 0.17 262)",
+          "oklch(0.4 0.2 262)",
+          "oklch(0.5 0.21 262)",
+          "oklch(0.64 0.18 262)",
+          "oklch(0.76 0.12 262)",
+          "oklch(0.86 0.07 262)",
+          "oklch(0.95 0.025 262)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "masthead": {
+        "displayName": "Masthead",
+        "purpose": "Home title only. Archivo wdth 62, 800, uppercase."
+      },
+      "agora": {
+        "displayName": "AGORA line",
+        "purpose": "The one next step, with the live dot. Condensed caps, 36px rising to 60px."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Program (album) title and section titles. All h1-h3 take wdth 62, 800, uppercase."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Normal-width Archivo for text, fields, names and buttons."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Column heads, badges and captions; 12px bold uppercase, tabular numerals for years and times."
+      },
+      "brand": {
+        "displayName": "Brand",
+        "purpose": "Wordmark beside the logo mark in the masthead; condensed caps, about 26px."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover",
+        "value": "0 10px 20px -8px rgb(0 0 0 / 0.35)",
+        "purpose": "The member options menu, the only floating surface."
+      },
+      {
+        "name": "rule-box",
+        "value": "1.5px solid ink border, no blur",
+        "purpose": "Boxes, controls and the grid are separated by ruled lines, not shadows."
+      },
+      {
+        "name": "rule-top-program",
+        "value": "6px solid ink top border",
+        "purpose": "Program boxes (album card, create group)."
+      },
+      {
+        "name": "rule-section",
+        "value": "3px solid ink rule",
+        "purpose": "Masthead bottom rule and section top rules."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-print",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Entrances (opacity and 10-12px rise, 0.35-0.45s) and stamps."
+      },
+      {
+        "name": "stamp",
+        "value": "0.22s cubic-bezier(0.22, 1, 0.36, 1); scale 1.7 to 1, opacity 0 to 1",
+        "purpose": "A done mark landing in the grid."
+      },
+      {
+        "name": "band-in",
+        "value": "0.55s ease-print, 70ms stagger; scaleX 0 to 1 from left",
+        "purpose": "Six-slot band printing in."
+      },
+      {
+        "name": "tally",
+        "value": "2s ease-out infinite; scale 1 to 2.2, opacity 0.7 to 0",
+        "purpose": "Live dot pulse beside the AGORA line."
+      },
+      {
+        "name": "roulette",
+        "value": "7s cubic-bezier(0.1, 0.75, 0.12, 1)",
+        "purpose": "Cover tape decelerating onto the winner; winner scales to 1.05, others dim to 35% greyscale over 0.5s."
+      },
+      {
+        "name": "state-transition",
+        "value": "150ms colour transition",
+        "purpose": "Hover fill shifts on buttons and tiles."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation and transition durations collapse to 0.01ms; roulette jumps to result",
+        "purpose": "prefers-reduced-motion support."
+      },
+      {
+        "name": "sound",
+        "value": "Web Audio, no files; master gain 0.6 through a compressor limiter; off by default, choice persisted",
+        "purpose": "Pen click, teleprinter tick and noise tape, stamp thud for vote and ready, two-note join chime, low square buzz on error, stamp plus bell chord on lock."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
+        "name": "container",
+        "value": "72rem (max-w-6xl)"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Logo and Masthead",
+      "kind": "nav",
+      "refersTo": "typography.brand",
+      "description": "Newspaper strip: logo mark with wordmark, today's date, and an icon-only sound toggle, closed with a 3px ink rule.",
+      "html": "<div class=\"ds-masthead\"><div class=\"ds-masthead-id\"><span class=\"ds-logo\"><svg class=\"ds-logo-mark\" viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" rx=\"6\" fill=\"currentColor\"/><circle cx=\"31\" cy=\"34\" r=\"19\" style=\"fill:var(--background)\"/><circle cx=\"31\" cy=\"34\" r=\"11\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\"/><circle cx=\"31\" cy=\"34\" r=\"3.6\" fill=\"currentColor\"/><circle cx=\"51\" cy=\"13\" r=\"7.5\" style=\"fill:var(--live);stroke:var(--background);stroke-width:2.5\"/></svg><span class=\"ds-brand\">Disco da Vez</span></span><span class=\"ds-date\">Domingo, 18 de outubro</span></div><button class=\"ds-sound\" aria-pressed=\"false\" aria-label=\"Som\" title=\"Ligar o som\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M11 5 6 9H2v6h4l5 4z\"/><path d=\"m22 9-6 6\"/><path d=\"m16 9 6 6\"/></svg></button></div>",
+      "css": ".ds-masthead { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; border-bottom: 3px solid var(--foreground); padding-bottom: 12px; font-family: 'Archivo Variable', system-ui, sans-serif; color: var(--foreground); } .ds-masthead-id { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; min-width: 0; } .ds-logo { display: inline-flex; align-items: center; gap: 10px; } .ds-logo-mark { width: 32px; height: 32px; flex: none; } .ds-brand { font-size: 26.4px; font-weight: 800; text-transform: uppercase; line-height: 1; font-stretch: 62%; } .ds-date { font-size: 14px; font-weight: 500; color: var(--muted-foreground); } .ds-sound { display: grid; place-items: center; width: 44px; height: 44px; border: 1.5px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); cursor: pointer; transition: background-color 150ms; } .ds-sound:hover { background: var(--muted); } .ds-sound:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "AGORA Line",
+      "kind": "custom",
+      "refersTo": "typography.agora",
+      "description": "The one next step in condensed caps, led by the pulsing red live dot, with person chips below (yours is blue).",
+      "html": "<div class=\"ds-agora\"><p class=\"ds-agora-line\"><span class=\"ds-live\"></span><span><span class=\"ds-agora-lead\">Agora: </span>Escolha até 5 bandas</span></p><div class=\"ds-chips\"><span class=\"ds-chip ds-you\">A<i class=\"ds-chip-mark ds-chip-done\"></i></span><span class=\"ds-chip\">B<i class=\"ds-chip-mark ds-chip-pending\"></i></span><span class=\"ds-chip\">C<i class=\"ds-chip-mark ds-chip-pending\"></i></span></div></div>",
+      "css": ".ds-agora { display: grid; gap: 12px; font-family: 'Archivo Variable', system-ui, sans-serif; color: var(--foreground); } .ds-agora-line { display: flex; align-items: flex-start; gap: 12px; margin: 0; font-size: 36px; font-weight: 800; text-transform: uppercase; line-height: 0.92; font-stretch: 62%; } .ds-agora-lead { color: var(--muted-foreground); } .ds-live { position: relative; display: inline-block; flex: none; width: 0.7em; height: 0.7em; margin-top: 0.12em; border-radius: 9999px; background: var(--live); } .ds-live::after { content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid var(--live); animation: ds-tally 2s ease-out infinite; } @keyframes ds-tally { from { transform: scale(1); opacity: 0.7; } to { transform: scale(2.2); opacity: 0; } } .ds-chips { display: flex; gap: 10px; } .ds-chip { position: relative; display: grid; place-items: center; width: 36px; height: 36px; border: 1.5px solid var(--foreground); box-sizing: border-box; background: var(--card); color: var(--foreground); font-size: 16px; font-weight: 800; } .ds-chip.ds-you { background: var(--you); color: var(--you-ink); } .ds-chip-mark { position: absolute; right: -6px; bottom: -6px; width: 16px; height: 16px; box-sizing: border-box; border: 1.5px solid var(--foreground); border-radius: 2px; background: var(--card); } .ds-chip-done { background: var(--foreground); } .ds-chip-pending { background: repeating-linear-gradient(45deg, var(--foreground) 0 1.5px, var(--card) 1.5px 5px); } @media (prefers-reduced-motion: reduce) { .ds-live::after { animation: none; } }"
+    },
+    {
+      "name": "The Grade (people grid)",
+      "kind": "custom",
+      "refersTo": "components.grade-row",
+      "description": "Signature people grid: card-stock name cells (your row in You Blue), then fixed columns of shape marks for each step.",
+      "html": "<div class=\"ds-grade\"><div class=\"ds-grade-head\"><span class=\"ds-grade-h1\">Pessoa</span><span class=\"ds-grade-col\">Escolhas</span><span class=\"ds-grade-col\">Voto</span></div><div class=\"ds-grade-row\"><div class=\"ds-grade-name ds-you\">Ana <small>(você)</small></div><div class=\"ds-grade-col\"><i class=\"ds-mark ds-mark-done\"></i></div><div class=\"ds-grade-col\"><i class=\"ds-mark ds-mark-pending\"></i></div></div><div class=\"ds-grade-row\"><div class=\"ds-grade-name\">Beto</div><div class=\"ds-grade-col\"><i class=\"ds-mark ds-mark-pending\"></i></div><div class=\"ds-grade-col\"><i class=\"ds-mark ds-mark-na\"></i></div></div><p class=\"ds-grade-legend\"><i class=\"ds-mark ds-mark-done ds-sm\"></i> feito <i class=\"ds-mark ds-mark-pending ds-sm\"></i> aguardando <i class=\"ds-mark ds-mark-na\"></i> não se aplica</p></div>",
+      "css": ".ds-grade { background: var(--card); border: 1.5px solid var(--foreground); border-radius: 4px; font-family: 'Archivo Variable', system-ui, sans-serif; color: var(--foreground); } .ds-grade-head { display: flex; border-bottom: 1.5px solid var(--foreground); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; color: var(--muted-foreground); } .ds-grade-h1 { flex: 1; padding: 6px 12px; } .ds-grade-head .ds-grade-col { padding: 6px 0; } .ds-grade-row { display: flex; align-items: stretch; min-height: 56px; border-bottom: 1px solid color-mix(in oklch, var(--foreground) 20%, transparent); padding-right: 44px; } .ds-grade-name { flex: 1; display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card); color: var(--foreground); font-size: 16px; font-weight: 700; } .ds-grade-name.ds-you { background: var(--you); color: var(--you-ink); } .ds-grade-name small { font-size: 12px; font-weight: 500; opacity: 0.8; } .ds-grade-col { display: flex; align-items: center; justify-content: center; width: 72px; border-left: 1px solid color-mix(in oklch, var(--foreground) 20%, transparent); } .ds-mark { display: inline-block; flex: none; width: 20px; height: 20px; box-sizing: border-box; border: 2px solid var(--foreground); border-radius: 2px; } .ds-mark-done { background: var(--foreground); } .ds-mark-pending { background: repeating-linear-gradient(45deg, var(--foreground) 0 1.5px, transparent 1.5px 5px); } .ds-mark-na { border: 0; height: 2px; width: 14px; background: var(--foreground); opacity: 0.4; } .ds-sm { width: 12px; height: 12px; } .ds-grade-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin: 0; padding: 8px 12px; border-top: 1.5px solid var(--foreground); font-size: 12px; color: var(--muted-foreground); }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled, ruled, 44px; the one main action per step.",
+      "html": "<button class=\"ds-btn-primary\">Criar e convidar amigos</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border: 1.5px solid var(--foreground); border-radius: 4px; background: var(--foreground); color: var(--background); font-family: 'Archivo Variable', system-ui, sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms; } .ds-btn-primary:hover { background: color-mix(in oklch, var(--foreground) 85%, transparent); } .ds-btn-primary:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.45; pointer-events: none; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action on card stock; fills with a muted wash on hover.",
+      "html": "<button class=\"ds-btn-outline\">YouTube Music</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border: 1.5px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); font-family: 'Archivo Variable', system-ui, sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 150ms; } .ds-btn-outline:hover { background: var(--muted); } .ds-btn-outline:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Ruled 44px field on card stock; paper fill on focus, live-red caret.",
+      "html": "<input class=\"ds-input\" placeholder=\"Nome do grupo\" />",
+      "css": ".ds-input { box-sizing: border-box; width: 100%; height: 44px; padding: 4px 12px; border: 1.5px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); caret-color: var(--live); font-family: 'Archivo Variable', system-ui, sans-serif; font-size: 16px; outline: none; transition: background-color 150ms; } .ds-input::placeholder { color: var(--muted-foreground); } .ds-input:focus-visible { background: var(--background); outline: 3px solid var(--ring); outline-offset: 2px; } .ds-input[aria-invalid='true'] { border-color: var(--destructive); }"
+    },
+    {
+      "name": "Badge",
+      "kind": "chip",
+      "refersTo": "badge",
+      "description": "Small uppercase ruled tag; ink fill by default, 40% ink outline for genre tags.",
+      "html": "<span class=\"ds-badge\">Post-rock</span> <span class=\"ds-badge ds-badge-outline\">Shoegaze</span>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; height: 28px; padding: 0 8px; border: 1.5px solid var(--foreground); border-radius: 2.4px; background: var(--foreground); color: var(--background); font-family: 'Archivo Variable', system-ui, sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.025em; white-space: nowrap; } .ds-badge-outline { background: transparent; color: var(--foreground); border-color: color-mix(in oklch, var(--foreground) 40%, transparent); }"
+    },
+    {
+      "name": "Program Box (Album Card)",
+      "kind": "card",
+      "refersTo": "program-box",
+      "description": "Prime-time program: 0-radius card stock with a 6px ink top rule, condensed caps title, and an inlay-style tracklist.",
+      "html": "<div class=\"ds-program\"><h2 class=\"ds-program-title\">Loveless</h2><p class=\"ds-program-artist\">My Bloody Valentine</p><p class=\"ds-program-meta\">1991 · 11 faixas · 49 min</p><ol class=\"ds-tracks\"><li><span>1</span><span>Only Shallow</span><span>4:17</span></li><li><span>2</span><span>Loomer</span><span>2:38</span></li><li><span>3</span><span>Touched</span><span>0:56</span></li></ol></div>",
+      "css": ".ds-program { box-sizing: border-box; padding: 16px; background: var(--card); border: 1.5px solid var(--foreground); border-top-width: 6px; border-radius: 0; font-family: 'Archivo Variable', system-ui, sans-serif; color: var(--foreground); } .ds-program-title { margin: 0; font-size: 48px; font-weight: 800; text-transform: uppercase; line-height: 0.9; letter-spacing: -0.005em; font-stretch: 62%; } .ds-program-artist { margin: 8px 0 0; font-size: 20px; font-weight: 600; } .ds-program-meta { margin: 0 0 12px; font-size: 14px; color: var(--muted-foreground); font-variant-numeric: tabular-nums; } .ds-tracks { margin: 0; padding: 0; list-style: none; border: 1.5px solid var(--foreground); font-size: 14px; font-variant-numeric: tabular-nums; } .ds-tracks li { display: grid; grid-template-columns: 2rem 1fr auto; align-items: baseline; gap: 12px; padding: 8px 12px; border-bottom: 1px solid color-mix(in oklch, var(--foreground) 20%, transparent); } .ds-tracks li:last-child { border-bottom: 0; } .ds-tracks li span:first-child { text-align: right; color: var(--muted-foreground); } .ds-tracks li span:last-child { color: var(--muted-foreground); }"
+    },
+    {
+      "name": "Vote Tile",
+      "kind": "custom",
+      "refersTo": "components.program-box",
+      "description": "Candidate album as a boxed tile; the picked one inverts to full ink with a filled mark.",
+      "html": "<button class=\"ds-vote\"><span class=\"ds-vote-cover\"></span><span class=\"ds-vote-row\"><i class=\"ds-vote-mark\"></i><span><b>Loveless</b><small>My Bloody Valentine · 1991</small></span></span></button> <button class=\"ds-vote ds-vote-picked\" aria-pressed=\"true\"><span class=\"ds-vote-cover\"></span><span class=\"ds-vote-row\"><i class=\"ds-vote-mark\"></i><span><b>Disintegration</b><small>The Cure · 1989</small></span></span></button>",
+      "css": ".ds-vote { display: inline-flex; flex-direction: column; gap: 8px; width: 160px; padding: 8px; border: 1.5px solid var(--foreground); border-radius: 4px; background: var(--card); color: var(--foreground); font-family: 'Archivo Variable', system-ui, sans-serif; text-align: left; cursor: pointer; vertical-align: top; transition: background-color 150ms; } .ds-vote:hover { background: var(--muted); } .ds-vote:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; } .ds-vote-cover { display: block; aspect-ratio: 1; background: var(--accent); } .ds-vote-row { display: flex; align-items: flex-start; gap: 8px; } .ds-vote-row b { display: block; font-size: 14px; line-height: 1.2; } .ds-vote-row small { display: block; font-size: 12px; color: var(--muted-foreground); } .ds-vote-mark { flex: none; width: 20px; height: 20px; margin-top: 2px; box-sizing: border-box; border: 2px solid var(--foreground); border-radius: 2px; } .ds-vote-picked { background: var(--foreground); color: var(--background); } .ds-vote-picked:hover { background: var(--foreground); } .ds-vote-picked small { color: color-mix(in oklch, var(--background) 75%, transparent); } .ds-vote-picked .ds-vote-mark { border-color: var(--background); background: var(--background); }"
+    },
+    {
+      "name": "Six-Slot Band",
+      "kind": "custom",
+      "refersTo": "colors.you",
+      "description": "Six-slot strip with a halftone overprint: your blue slot first, five ink slots; prints in left to right on Home.",
+      "html": "<div class=\"ds-band\"><span style=\"background:var(--you)\"></span><span></span><span></span><span></span><span></span><span></span></div>",
+      "css": ".ds-band { position: relative; display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; height: 20px; } .ds-band span { background: var(--foreground); transform-origin: left; animation: ds-band-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; } .ds-band span:nth-child(2) { animation-delay: 70ms; } .ds-band span:nth-child(3) { animation-delay: 140ms; } .ds-band span:nth-child(4) { animation-delay: 210ms; } .ds-band span:nth-child(5) { animation-delay: 280ms; } .ds-band span:nth-child(6) { animation-delay: 350ms; } .ds-band::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, oklch(0 0 0 / 0.32) 0 1.1px, transparent 1.5px); background-size: 5px 5px; mix-blend-mode: multiply; pointer-events: none; } @keyframes ds-band-in { from { transform: scaleX(0); } to { transform: scaleX(1); } } @media (prefers-reduced-motion: reduce) { .ds-band span { animation: none; } }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Programming Grid",
+    "overview": "The group's night is one printed page of TV listings. Every person is a row, every step is a time slot, and the drawn album is the prime-time program. The surface is cool newsprint with a faint paper grain, set in near-black ink, divided by 1.5px rules. Nothing is lit, glassy or glowing; the page is read, not watched.\n\nThe mood is flat, printed, structural and quick to scan. Colour is rationed to meaning: one blue marks you (your row, your chip, your slot in the band), a red dot means \"live, do this now\", and everyone and everything else is ink on paper. State is read from shape, not hue, so the page works in a glance and in greyscale. Sound completes the print metaphor: pen clicks, teleprinter ticks, a stamp thud and a short programme-opening chime, all synthesized with Web Audio. Sound is off by default; the masthead icon toggle turns it on and the choice is remembered.\n\nThe previous valve-radio world was rejected as too decorative; its teal, amber, brass, glass and radio imagery do not return.",
+    "keyCharacteristics": [
+      "Newsprint paper, near-black ink, 1.5px ruled boxes, thick top rule on program boxes.",
+      "One accent, blue, for \"you\" only, plus the red live dot.",
+      "One typeface, Archivo Variable; width axis does the work of a second family.",
+      "State as shape: filled square, hatched square, dash.",
+      "Flat depth; one soft shadow, on the popover menu only.",
+      "44px touch targets, phone first, pt-BR.",
+      "Logo: ink square, paper disc with groove ring, one Live Red corner dot; never blue."
+    ],
+    "rules": [
+      {
+        "name": "The One-Accent-Is-You Rule",
+        "body": "The only colour is the blue that means \"you\", plus the red live dot. Other people are paper and ink; if a colour does not mark you or the one live step, it is ink or paper.",
+        "section": "colors"
+      },
+      {
+        "name": "The State-Is-Shape Rule",
+        "body": "Done, waiting and not-applicable are a filled square, a hatched square and a dash. Never encode state in hue, and keep the legend visible under any grid that uses the marks.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Family Rule",
+        "body": "Archivo Variable only. Contrast comes from width (62% vs 100%), weight and case, never from a second family.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-On-Paper Rule",
+        "body": "Surfaces never float. If something needs separating, add a rule; the popover is the only exception.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No-Decoration-Without-a-Job Rule",
+        "body": "Grain is paper, halftone is the print band, rules separate; nothing else ornamental.",
+        "section": "overview"
+      },
+      {
+        "name": "The Red-Dot-Is-Live Rule",
+        "body": "The logo dot is the same Live Red as the AGORA dot, and the mark never takes You Blue or any other colour.",
+        "section": "overview"
+      }
+    ],
+    "dos": [
+      "Do keep the page paper, ink and rules, and let the blue \"you\" be the only colour field.",
+      "Do show state with the filled, hatched and dash marks, and keep the legend under the grid.",
+      "Do set h1-h3 and the AGORA line in Archivo at wdth 62, weight 800, uppercase, line-height about 0.9; set everything else at normal width.",
+      "Do use 1.5px ink borders, 4px corners, and 0 radius with a 6px top rule for program boxes.",
+      "Do keep touch targets at 44px or more and rows at 56px.",
+      "Do put light ink (you-ink) on You Blue fills.",
+      "Do keep the live red to the dot, the needle tip and the caret, and reserve motion for stamps, band entrances, the pulse and the roulette.",
+      "Do keep the Pessoas menu, invite copy, profile and leader claim to the pre-round state; show a read-only grid while choosing and voting, and omit it on the draw screen so the content spans the full width."
+    ],
+    "donts": [
+      "Don't reintroduce the radio world: no teal, amber, brass, glass, blur, dials or valve imagery.",
+      "Don't give other people their own colours: per-person channel colours were tried and rejected.",
+      "Don't add decoration with no job (the No-Decoration-Without-a-Job Rule): grain is paper, halftone is the print band, rules separate; nothing else ornamental.",
+      "Don't use neon, glow, gradients as surfaces, or dark-mode music-app styling.",
+      "Don't encode state or status in hue, or colour anything that is not you or the live step.",
+      "Don't add a second typeface or fake a display face with fills or shadows.",
+      "Don't lift surfaces with shadows; the popover shadow is the only one.",
+      "Don't put a decorative eyebrow or kicker above headings; the \"Agora:\" lead belongs to the one-step line, not to section titles."
+    ]
+  }
+}
