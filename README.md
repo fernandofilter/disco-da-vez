@@ -1,4 +1,4 @@
-# Album Sort
+# Disco da Vez
 
 Grupos de 2–6 amigos escolhem artistas ou gêneros e o site sorteia (roleta estilo CS2) ou coloca em votação um álbum para todos ouvirem.
 SPA estática (Vite + React + shadcn/Tailwind) + Supabase (grupos em tempo real) + MusicBrainz/Cover Art Archive (álbuns) + Last.fm opcional (gêneros e "já escutei").

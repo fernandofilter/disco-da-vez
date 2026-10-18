@@ -1,4 +1,4 @@
--- Album Sort: grupos, rodadas, votos e histórico.
+-- Disco da Vez: grupos, rodadas, votos e histórico.
 -- Leitura via RLS (só membros do grupo); toda escrita passa por funções RPC (security definer).
 -- Requer "Anonymous sign-ins" habilitado em Authentication > Providers.
 

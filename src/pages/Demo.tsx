@@ -1,15 +1,59 @@
-import { useState } from 'react'
+import { RotateCcw } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { AlbumCard } from '@/components/AlbumCard'
 import { ChoicePicker } from '@/components/ChoicePicker'
+import { GroupView } from '@/components/GroupView'
 import { Roulette } from '@/components/Roulette'
 import { VotePanel } from '@/components/VotePanel'
 import { Button } from '@/components/ui/button'
 import { shuffle } from '@/lib/draw'
 import { artistAlbums, searchArtists } from '@/lib/musicbrainz'
-import type { Album } from '@/lib/types'
+import type { GroupState } from '@/hooks/useGroup'
+import type { Album, Member, Round, RoundChoice } from '@/lib/types'
+
+/** `/demo?room=idle|choosing|voting|drawing|spin`: a tela do grupo com dados fictícios (sem Supabase). `spin` já gira a roleta ao abrir; o botão no canto gira de novo (e libera o som). */
+function Room({ scenario }: { scenario: string }) {
+  const [albums, setAlbums] = useState<Album[]>([])
+  const [spin, setSpin] = useState(1)
+  useEffect(() => {
+    searchArtists('Radiohead').then(([a]) => artistAlbums(a)).then(setAlbums, () => setAlbums([]))
+  }, [])
+  const now = new Date().toISOString()
+  const names = ['Fernando', 'Bia', 'Caio', 'Dani']
+  const members: Member[] = names.map((name, i) => ({ id: `m${i}`, group_id: 'g', user_id: `u${i}`, name, lastfm_user: i === 1 ? 'bia_fm' : null, last_choices: {}, last_seen: now, joined_at: now }))
+  const live = scenario === 'spin' || spin > 1
+  const status = scenario === 'idle' ? null : scenario === 'choosing' ? 'choosing' : scenario === 'voting' ? 'voting' : 'drawing'
+  const round: Round | null = status
+    ? {
+        id: 'r1', group_id: 'g', mode: 'artist', kind: scenario === 'voting' ? 'vote' : 'draw', status, participants: members.map((m) => m.id),
+        candidates: scenario === 'voting' ? albums.slice(0, 6) : null,
+        result: (scenario === 'drawing' || scenario === 'spin') && albums.length ? { album: albums[3] ?? albums[0], filler: albums } : null,
+        spin, result_at: new Date(Date.now() - (live ? 0 : 60_000)).toISOString(),
+      }
+    : null
+  const choices: RoundChoice[] = round
+    ? members.map((m, i) => ({ round_id: 'r1', member_id: m.id, items: [{ id: `a${i}`, name: ['Radiohead', 'Björk', 'Os Mutantes'][i % 3] }], ready: i % 2 === 1, voted: i === 1 || i === 2 }))
+    : []
+  const data: GroupState = { userId: 'u0', group: { id: 'abc123', name: 'Clube da Quinta', leader_id: 'u0', last_mode: 'artist', last_kind: 'draw' }, members, me: members[0], round, choices, votes: scenario === 'voting' && albums[1] ? [{ round_id: 'r1', member_id: 'm0', album_id: albums[1].id }] : [], history: [] }
+  return (
+    <>
+      <GroupView data={data} refresh={() => {}} />
+      {status === 'drawing' && (
+        <Button size="lg" className="fixed bottom-4 right-4 z-50 shadow-[0_10px_20px_-8px_rgb(0_0_0/0.4)]" onClick={() => setSpin((s) => s + 1)}>
+          <RotateCcw /> Girar de novo (demo)
+        </Button>
+      )}
+    </>
+  )
+}
 
 /** Só em dev: exercita MusicBrainz + Cover Art Archive + roleta sem precisar de Supabase. */
 export default function Demo() {
+  const room = new URLSearchParams(location.search).get('room')
+  return room ? <Room scenario={room} /> : <Playground />
+}
+
+function Playground() {
   const [albums, setAlbums] = useState<Album[]>([])
   const [spin, setSpin] = useState(0)
   const [log, setLog] = useState('')

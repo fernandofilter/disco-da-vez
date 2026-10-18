@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { lastfmEnabled, lastfmUserExists } from '@/lib/lastfm'
+import { sfx } from '@/lib/sound'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
+import { Masthead, SoundToggle, TarjaBand } from './Guide'
 
 export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void }) {
   const [preview, setPreview] = useState<Awaited<ReturnType<typeof api.preview>> | false | undefined>(undefined)
@@ -26,6 +28,7 @@ export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void 
       await api.join(gid, name, lastfm)
       onJoined()
     } catch (err) {
+      sfx.error()
       toast.error(err instanceof Error ? err.message : 'Não consegui entrar')
     } finally {
       setBusy(false)
@@ -36,21 +39,27 @@ export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void 
   if (!preview) return <p className="mt-24 text-center text-muted-foreground">Grupo não encontrado. Confira o link do convite.</p>
 
   return (
-    <motion.form onSubmit={join} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-auto mt-16 max-w-md px-4">
-      <Card className="space-y-4 p-6">
-        <div>
-          <p className="text-sm text-muted-foreground">{preview.leader_name} te chamou para</p>
-          <h1 className="text-2xl font-bold">{preview.name}</h1>
-          <p className="text-sm text-muted-foreground">{preview.member_count}/6 pessoas</p>
-        </div>
-        <Input placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required autoFocus />
-        {lastfmEnabled && (
-          <Input placeholder="Usuário do Last.fm (opcional, evita álbuns que você já ouviu)" value={lastfm} onChange={(e) => setLastfm(e.target.value)} maxLength={40} />
-        )}
-        <Button type="submit" size="lg" disabled={busy || !name.trim() || preview.member_count >= 6}>
-          {preview.member_count >= 6 ? 'Grupo cheio' : busy ? 'Entrando…' : 'Entrar no grupo'}
-        </Button>
-      </Card>
-    </motion.form>
+    <main className="mx-auto max-w-xl px-4 pb-14 pt-4 sm:pt-6">
+      <Masthead>
+        <SoundToggle />
+      </Masthead>
+      <section className="space-y-3 py-8">
+        <p className="text-lg font-medium">{preview.leader_name} te chamou para</p>
+        <h1 className="break-words text-[clamp(3.5rem,16vw,6rem)]">{preview.name}</h1>
+        <p className="tnum text-sm font-semibold text-muted-foreground">{preview.member_count}/6 pessoas</p>
+      </section>
+      <TarjaBand />
+      <motion.form onSubmit={join} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.3, ease: [0.22, 1, 0.36, 1] }} className="mt-8">
+        <Card className="gap-4 rounded-none border-t-[6px] p-5">
+          <Input aria-label="Seu nome" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required autoFocus />
+          {lastfmEnabled && (
+            <Input aria-label="Usuário do Last.fm" placeholder="Usuário do Last.fm (opcional, evita álbuns que você já ouviu)" value={lastfm} onChange={(e) => setLastfm(e.target.value)} maxLength={40} />
+          )}
+          <Button type="submit" size="lg" disabled={busy || !name.trim() || preview.member_count >= 6}>
+            {preview.member_count >= 6 ? 'Grupo cheio' : busy ? 'Entrando…' : 'Entrar no grupo'}
+          </Button>
+        </Card>
+      </motion.form>
+    </main>
   )
 }

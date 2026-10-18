@@ -1,242 +1,257 @@
 ---
-name: Album Sort
-description: Dark listening room where the album cover is the only light and a violet needle marks the decision.
+name: Disco da Vez
+description: A printed TV-programming grid for a group's album night. Newsprint, ink rules, and one blue for you.
 colors:
-  amethyst: "oklch(0.72 0.19 295)"
-  amethyst-ink: "oklch(0.12 0.02 295)"
-  graphite-violet: "oklch(0.13 0.012 285)"
-  graphite-card: "oklch(0.18 0.015 285)"
-  graphite-raised: "oklch(0.269 0 0)"
-  graphite-popover: "oklch(0.205 0 0)"
-  paper-white: "oklch(0.985 0 0)"
-  ash: "oklch(0.708 0 0)"
-  hairline: "oklch(1 0 0 / 10%)"
-  field-line: "oklch(1 0 0 / 15%)"
-  alarm: "oklch(0.704 0.191 22.216)"
-  crown-amber: "#fbbf24"
+  paper: "oklch(0.965 0.007 250)"
+  card: "oklch(0.99 0.004 250)"
+  popover: "oklch(0.995 0.003 250)"
+  ink: "oklch(0.17 0.012 262)"
+  ink-soft: "oklch(0.42 0.015 262)"
+  paper-ink: "oklch(0.985 0.004 250)"
+  muted: "oklch(0.93 0.008 250)"
+  secondary: "oklch(0.925 0.009 250)"
+  accent: "oklch(0.9 0.012 250)"
+  rule: "oklch(0.17 0.012 262 / 0.2)"
+  live: "oklch(0.58 0.22 27)"
+  destructive: "oklch(0.5 0.21 27)"
+  you: "oklch(0.5 0.21 262)"
+  you-ink: "oklch(0.99 0 0)"
 typography:
-  display:
-    fontFamily: "Geist Variable, sans-serif"
-    fontSize: "3rem"
+  masthead:
+    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontSize: "clamp(3.6rem, 19vw, 6rem)"
     fontWeight: 800
-    lineHeight: 1
-    letterSpacing: "-0.025em"
+    lineHeight: 0.9
+    letterSpacing: "-0.005em"
+    fontVariation: "'wdth' 62"
+  agora:
+    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontSize: "2.25rem (3.75rem from 640px)"
+    fontWeight: 800
+    lineHeight: 0.92
+    fontVariation: "'wdth' 62"
   headline:
-    fontFamily: "Geist Variable, sans-serif"
-    fontSize: "1.875rem"
-    fontWeight: 700
-    lineHeight: 1.2
-  title:
-    fontFamily: "Geist Variable, sans-serif"
-    fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.5
+    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontSize: "3rem (3.75rem from 640px) for the program title, 1.875rem for section titles"
+    fontWeight: 800
+    lineHeight: 0.9
+    letterSpacing: "-0.005em"
+    fontVariation: "'wdth' 62"
   body:
-    fontFamily: "Geist Variable, sans-serif"
-    fontSize: "0.875rem"
+    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.5
   label:
-    fontFamily: "Geist Variable, sans-serif"
+    fontFamily: "Archivo Variable, system-ui, sans-serif"
     fontSize: "0.75rem"
-    fontWeight: 500
+    fontWeight: 700
     lineHeight: 1.33
+    letterSpacing: "0.025em"
 rounded:
-  sm: "6px"
-  md: "8px"
-  lg: "10px"
-  xl: "14px"
-  2xl: "18px"
-  full: "9999px"
+  none: "0px"
+  mark: "2px"
+  sm: "calc(0.25rem * 0.6)"
+  base: "0.25rem"
 spacing:
-  xs: "4px"
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "24px"
-  2xl: "40px"
+  xs: "8px"
+  sm: "12px"
+  md: "16px"
+  lg: "24px"
+  xl: "32px"
+  touch: "44px"
+  row: "56px"
 components:
   button-primary:
-    backgroundColor: "{colors.amethyst}"
-    textColor: "{colors.amethyst-ink}"
-    rounded: "{rounded.lg}"
-    height: "32px"
-    padding: "0 10px"
-  button-primary-lg:
-    backgroundColor: "{colors.amethyst}"
-    textColor: "{colors.amethyst-ink}"
-    rounded: "{rounded.lg}"
-    height: "36px"
-    padding: "0 10px"
-  button-secondary:
-    backgroundColor: "{colors.graphite-raised}"
-    textColor: "{colors.paper-white}"
-    rounded: "{rounded.lg}"
-    height: "32px"
-    padding: "0 10px"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper-ink}"
+    rounded: "{rounded.base}"
+    padding: "0 16px"
+    height: "44px"
   button-outline:
-    backgroundColor: "{colors.graphite-raised}"
-    textColor: "{colors.paper-white}"
-    rounded: "{rounded.lg}"
-    height: "32px"
-    padding: "0 10px"
-  card:
-    backgroundColor: "{colors.graphite-card}"
-    textColor: "{colors.paper-white}"
-    rounded: "{rounded.xl}"
-    padding: "16px"
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.base}"
+    padding: "0 16px"
+    height: "44px"
+  button-outline-hover:
+    backgroundColor: "{colors.muted}"
   input:
-    backgroundColor: "{colors.graphite-raised}"
-    textColor: "{colors.paper-white}"
-    rounded: "{rounded.lg}"
-    height: "32px"
-    padding: "4px 10px"
-  member-row:
-    backgroundColor: "{colors.graphite-card}"
-    textColor: "{colors.paper-white}"
-    rounded: "{rounded.xl}"
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.base}"
+    padding: "4px 12px"
+    height: "44px"
+  badge:
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.paper-ink}"
+    rounded: "{rounded.sm}"
+    padding: "0 8px"
+    height: "28px"
+  program-box:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
+    padding: "16px"
+  grade-row:
+    backgroundColor: "{colors.card}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
     padding: "8px 12px"
-  roulette-frame:
-    backgroundColor: "{colors.graphite-card}"
-    rounded: "{rounded.2xl}"
-    height: "176px"
+    height: "56px"
+  grade-row-you:
+    backgroundColor: "{colors.you}"
+    textColor: "{colors.you-ink}"
 ---
 
-# Design System: Album Sort
+# Design System: Disco da Vez
 
 ## Overview
 
-**Creative North Star: "The Listening Room"**
+**Creative North Star: "The Programming Grid"**
 
-A dark, quiet room where the album cover is the only light source. The interface is a low-lit graphite shell tinted faintly violet; everything that is not the music steps back. Color is rationed: a single amethyst accent marks the one thing that matters on a screen at that moment (the roulette needle, the leader's primary action, the vote you cast). Typography is plain and confident, one family, no ornament. The product's drama lives in the roulette and the reveal, not in the chrome around them.
+The group's night is one printed page of TV listings. Every person is a row, every step is a time slot, and the drawn album is the prime-time program. The surface is cool newsprint with a light paper grain, set in near-black ink, divided by 1.5px rules. Nothing is lit, glassy or glowing; the page is read, not watched.
 
-The system is dark-only by design: the `html` element carries the `dark` class permanently and `color-scheme: dark` is set globally. It is built for phones held in a dim living room, at a gathering, with friends beside you. Density is comfortable and touch-sized; most screens are a single column of sections that never exceeds a 56rem reading width.
+The mood is flat, printed, structural and quick to scan. Colour is rationed to meaning: one blue marks you (your row, your chip, your slot in the band), a red dot means "live, do this now", and everyone and everything else is ink on paper. State is read from shape, not hue, so the page works in a glance and in greyscale. Sound completes the print metaphor: pen clicks, teleprinter ticks, a stamp thud and a short programme-opening chime, all synthesized with Web Audio. Sound is off by default; the masthead icon toggle turns it on and the choice is remembered.
+
+The previous valve-radio world was rejected as too decorative; its teal, amber, brass, glass and radio imagery do not return.
 
 **Key Characteristics:**
-- Dark graphite with a violet undertone (hue 285), never pure black and never a light mode.
-- One accent (amethyst, hue 295), used sparingly and with a glow only at moments of decision.
-- Covers are the imagery; ornament is almost nonexistent.
-- Flat, tonal surfaces with 1px translucent rings instead of drop shadows.
-- Rounded but not pillowy: 10px controls, 14px cards, 18px for the roulette frame.
-- Motion is spring-based and purposeful: entrances, the reveal, the vote tick.
+- Newsprint paper, near-black ink, 1.5px ruled boxes, thick top rule on program boxes.
+- One accent, blue, for "you" only, plus the red live dot.
+- One typeface, Archivo Variable; width axis does the work of a second family.
+- State as shape: filled square, hatched square, dash.
+- Flat depth; one soft shadow, on the popover menu only.
+- 44px touch targets, phone first, pt-BR.
 
 ## Colors
 
-A violet-tinted graphite room lit by a single amethyst lamp.
+A near-monochrome newsprint palette with one spot-ink blue for you and one red for live.
 
 ### Primary
-- **Amethyst** (oklch(0.72 0.19 295)): The only accent. Primary buttons, the roulette needle and its glow, the selected vote ring, the winning cover's halo, the spinning disc hub, avatar tint (at 15% alpha), and the focus ring. Its rarity is the point.
-- **Amethyst Ink** (oklch(0.12 0.02 295)): Text on any amethyst fill.
+- **Press Ink** (ink): the single working colour. Text, rules, borders, primary buttons, selected tiles, the filled "done" mark, selection highlight, scrollbar.
+
+### Secondary
+- **You Blue** (you, with you-ink text): flat cobalt for the signed-in person only: their row in the grid, their chip in the AGORA row, the first slot of the six-slot band. The focus ring reuses its value.
+- **Live Red** (live): the on-air dot beside the AGORA line, the roulette needle tip, and the text caret. Never used for fills or text.
 
 ### Neutral
-- **Graphite Violet** (oklch(0.13 0.012 285)): Page background, matched by the browser `theme-color` (#13111a).
-- **Graphite Card** (oklch(0.18 0.015 285)): Cards, member rows, vote tiles, the roulette frame (at 60% alpha).
-- **Graphite Raised** (oklch(0.269 0 0)): Secondary buttons, muted fills, hover states, badges.
-- **Graphite Popover** (oklch(0.205 0 0)): Popovers, menus, and dialogs.
-- **Paper White** (oklch(0.985 0 0)): Primary text.
-- **Ash** (oklch(0.708 0 0)): Secondary text, hints, metadata, placeholders.
-- **Hairline** (oklch(1 0 0 / 10%)): Borders and the 1px card ring.
-- **Field Line** (oklch(1 0 0 / 15%)): Input borders.
-
-### Semantic
-- **Alarm** (oklch(0.704 0.191 22.216)): Destructive actions ("Remover", "Sair do grupo") and invalid fields; used as low-alpha fills with Alarm text.
-- **Crown Amber** (#fbbf24): The leader crown icon only.
-- **Rarity Strip** (#71717a, #3b82f6, #8b5cf6, #d946ef, #ef4444, #eab308): A 4px bottom edge on each roulette cover, assigned deterministically per album. A deliberate nod to loot-box rarity; it appears nowhere else.
+- **Cool Newsprint** (paper): page background, with a light fractal-noise grain tiled at 200px.
+- **Card Stock** (card): box and input fill. **Popover Stock** (popover): the one floating menu.
+- **Mute Wash / Secondary Wash / Accent Wash** (muted, secondary, accent): hover and recessed fills, such as the roulette window and ghost hover.
+- **Soft Ink** (ink-soft): secondary text, column heads, years, running times.
+- **Hairline Rule** (rule, ink at 20%): row dividers and column separators inside boxes.
+- **Paper Ink** (paper-ink): text on ink fills.
+- **Correction Red** (destructive): destructive buttons and invalid fields only, darker than live red. The focus ring is a 3px outline with 2px offset in the You Blue value, functional rather than decorative.
 
 ### Named Rules
-**The One Lamp Rule.** Amethyst is the only accent. If two things on a screen are amethyst, one of them is wrong. The roulette needle, the leader's current action, or the selected vote: pick one.
-**The Cover Is The Light Rule.** Saturated color comes from album covers. The interface never competes with a cover for chroma.
+**The One-Accent-Is-You Rule.** The only colour is the blue that means "you", plus the red live dot. Other people are paper and ink; if a colour does not mark you or the one live step, it is ink or paper.
+
+**The State-Is-Shape Rule.** Done, waiting and not-applicable are a filled square, a hatched square and a dash. Never encode state in hue, and keep the legend visible under any grid that uses the marks.
 
 ## Typography
 
-**Display Font:** Geist Variable (sans-serif fallback)
-**Body Font:** Geist Variable (sans-serif fallback)
+**Display Font:** Archivo Variable (system-ui, sans-serif fallback), width axis 62%
+**Body Font:** Archivo Variable at 100% width
+**Label/Mono Font:** none; tabular numerals (`tabular-nums`) for years, counts and running times
 
-**Character:** A single neutral geometric sans carries everything. Hierarchy comes from weight and size, never from a second family.
+**Character:** A single grotesque used two ways, like a newspaper. Condensed heavy capitals shout the masthead, headings and the AGORA line; normal-width text carries everything else.
 
 ### Hierarchy
-- **Display** (800, 3rem/48px at sm and up, 2.25rem/36px on mobile, line-height 1, tracking -0.025em): The wordmark "Album Sort" on the home page.
-- **Headline** (700, 1.875rem/30px, 1.2): The group name and the revealed album title (1.5rem on mobile).
-- **Title** (600, 1.125rem/18px): Section headings ("Pessoas", "Nova rodada", "Votação").
-- **Body** (400, 0.875rem/14px, 1.5): Default text, lists, tracklist. Inputs use 1rem on mobile to avoid zoom, 0.875rem from md.
-- **Label** (500, 0.75rem to 0.875rem): Badges, button text (0.875rem/500), metadata.
+- **Masthead** (800, wdth 62, uppercase, clamp(3.6rem, 19vw, 6rem), 0.9): the Home title only.
+- **AGORA line** (800, wdth 62, uppercase, 2.25rem rising to 3.75rem at 640px, 0.92): the one next step, led by a muted "Agora:" and the live dot.
+- **Headline** (800, wdth 62, uppercase, 3rem to 3.75rem, 0.9): the program (album) title. Section titles use 1.875rem. All h1-h3 take this treatment from base CSS.
+- **Brand** (800, wdth 62, uppercase, about 26px / 1.65rem): the "Disco da Vez" wordmark next to the logo mark in the masthead strip, beside the long-form date in 14px medium Soft Ink.
+- **Body** (400-600, 16px, 1.5): form fields, names (700), buttons (600), copy up to about 26rem measure on Home.
+- **Label** (700, 12px, +0.025em, uppercase): grid column heads, badges, "Faixas", roulette caption.
 
 ### Named Rules
-**The Numbers Align Rule.** Durations and track numbers use tabular numerals so columns stay in line.
+**The One-Family Rule.** Archivo Variable only. Contrast comes from width (62% vs 100%), weight and case, never from a second family.
 
 ## Layout
 
-A single centered column, `max-width: 56rem` (max-w-4xl), 16px side gutters, 24px (mobile) to 40px vertical padding. Sections stack with 32px gaps; each section is a title, an optional muted hint, then content at a 12px gap. Members flow in a 1, 2, then 3 column grid; vote candidates in 2 then 3 columns. The home page is a split hero on md and up (wordmark left, forms right), stacked on mobile. Spacing is Tailwind's 4px base; use the existing rhythm: 8px between related controls, 12px between hint and content, 24px within cards, 32px between sections. Touch targets: primary actions use the 36px large button; secondary icon buttons are 28 to 32px and should be treated as the floor, not the target.
+A single column of ruled bands, capped at max-w-6xl (72rem) with 16px side padding. On phones the order is: masthead strip, group name, AGORA line with the readiness chips, the active step, then the people grid. From 1024px the room splits into a 23rem aside (the grid) and a fluid main column; Home splits into two equal columns from 768px. The spacing rhythm is a 4px grid, mostly 8, 12, 16 and 24px, with 32px between major bands. Interactive targets are at least 44px; grid rows are at least 56px. Major sections open with a 3px ink top rule and 12px of padding; the masthead closes with a 3px bottom rule.
+
+The "Pessoas" section is fully available only before a round starts: the people menu, "Copiar convite", "Meu perfil" and leader claim all live there. During choosing and voting it is a read-only grid with no menu column. On the draw screen (drawing) it is not rendered at all, and the content column spans the full width on desktop.
+
+The people grid is a table of ruled rows: the name sits in a card-stock cell (your own row is filled You Blue), then fixed 72px columns (Escolhas, Voto) hold marks, then a 44px menu cell (only before a round starts). Tracks in the album card use a 2rem number, a flexible title and right-aligned running times, like an inlay card.
 
 ## Elevation & Depth
 
-Hybrid, but mostly flat. Surfaces are tonal (background, card, raised) separated by a 1px translucent ring (`ring-1 ring-foreground/10`). Shadows are reserved for moments of decision and are colored, not black.
+Flat. Depth comes only from 1.5px ink borders, hairline dividers, a 6px top rule on program boxes, and tonal steps between paper, card and wash. The single shadow is a soft popover shadow under the member menu. Nothing lifts on hover; hover changes fill.
 
 ### Shadow Vocabulary
-- **Needle Glow** (`box-shadow: 0 0 14px 2px <amethyst>`): The roulette's center line.
-- **Winner Halo** (`box-shadow: 0 0 32px -4px <amethyst>`, scale 1.05): The cover that stopped under the needle.
-- **Vote Halo** (`box-shadow: 0 0 28px -6px <amethyst>` plus a 2px amethyst ring): The tile you voted for.
-- **Cover Lift** (`shadow-2xl` tinted amethyst at 20%): The revealed album's cover.
-- **Disc Glow** (`0 0 60px -10px <amethyst>`): The spinning disc on the home page.
-- **Menu Float** (`shadow-xl`): The member options popover.
+- **Popover** (`box-shadow: 0 10px 20px -8px rgb(0 0 0 / 0.35)`): the member options menu only.
 
 ### Named Rules
-**The Glow Is An Event Rule.** A violet glow appears only when something has been decided or is being decided. Never on idle resting surfaces.
+**The Flat-On-Paper Rule.** Surfaces never float. If something needs separating, add a rule; the popover is the only exception.
 
 ## Shapes
 
-Rounded, practical, consistent. A single `--radius` of 0.625rem (10px) derives the scale: sm 6px, md 8px, lg 10px, xl 14px, 2xl 18px. Controls (buttons, inputs, segmented options) are 10px (or 8px inside the segmented control); cards, member rows, vote tiles and the album cover are 14px; the roulette frame is 18px. Avatars and the vote tick are full circles. The disc motif (conic gradient plus a hub and a spindle hole) is the brand's only recurring geometry.
+Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% of that). Program boxes (album card, create-group card) have 0 radius with a 6px ink top rule, like a boxed listing. State marks are 20px squares with a 2px border and 2px corners. The only circle is the live dot. Borders are 1.5px ink on boxes and controls, 2px on marks, 1px at 20% for inner dividers. A halftone dot band (5px radial dots, multiplied) overprints the six-slot strip on Home (one blue slot, five ink slots, 6px gaps), evoking print registration.
 
 ## Components
 
 ### Buttons
-- **Shape:** 10px radius, 32px tall by default, 36px for the primary "large" action, 28px small, 24px extra-small; icon buttons are square.
-- **Primary:** Amethyst fill with Amethyst Ink text, 80% opacity on hover; used for the single leading action in a section.
-- **Secondary:** Graphite Raised fill, Paper White text; a 5% foreground mix on hover.
-- **Outline:** Transparent-ish fill (input at 30% alpha) with a Field Line border; used for copy invite, "Voltar às escolhas".
-- **Ghost / Destructive / Link:** Ghost for menu rows; destructive is an Alarm tint at 10 to 20%; link is amethyst text.
-- **Focus / Active:** A 3px ring in amethyst at 50% plus a 1px translate-down on press. Disabled drops to 50% opacity.
+- **Shape:** 4px corners, 1.5px ink border, height 44px (48px large, 32px extra-small only for dense cases), 16px side padding, semibold 14px.
+- **Primary:** Press Ink fill, Paper Ink text.
+- **Outline:** Card Stock fill; **Secondary:** secondary wash; **Ghost:** transparent border; **Destructive:** correction-red border and text on card; **Link:** underlined.
+- **Hover / Focus:** fill shifts (primary to 85% ink, outline to muted) over 150ms; focus is a 3px cobalt outline with 2px offset. Disabled drops to 45% opacity.
 
-### Cards / Containers
-- **Corner Style:** 14px.
-- **Background:** Graphite Card with a 1px foreground ring at 10%.
-- **Internal Padding:** 16px (comfortable), 12px for the small size; the album card uses 16 to 20px.
-- **Shadow Strategy:** None at rest (see Elevation).
+### The Grade (people grid)
+- One row per person: card-stock name cell (the signed-in person's row is solid You Blue with light ink), crown icon for the leader, a "(você)" tag, optional Last.fm line.
+- Columns of 72px with the shape marks; a header row in Soft Ink uppercase 12px; a legend row under the box. Marks are announced with aria-labels.
+- Motion: a "done" mark stamps in (scale 1.7 to 1, 0.22s). Rows fade in and out with layout animation.
+
+### Mark
+- Filled ink square = done; 45-degree hatched square = waiting; short 2px dash at 40% = not applicable; hollow = empty (the unpicked vote tile). Corner chips on person initials use the same marks on a card-coloured square.
+
+### AGORA line and Chips
+- The live dot pulses outward (tally, 2s ease-out, loops) beside the 62% caps line. Beneath it, 36px square chips carry each person's initial with a mark at the corner; your chip is blue, the others are card stock with a 1.5px ink border.
+
+### Program Box
+- Card Stock fill, 1.5px ink border, 0 radius, 6px top rule, 16 to 20px padding. Holds the album (cover, title, artist, a meta line, outline badges, listen buttons, a ruled tracklist `details`) and the Create group form.
 
 ### Inputs / Fields
-- **Style:** 32px tall, 10px radius, transparent fill with a Field Line border in dark (input at 30% alpha).
-- **Focus:** Border shifts to ring color and a 3px amethyst ring at 50%.
-- **Error / Disabled:** Alarm border with a 20 to 40% Alarm ring; disabled at 50% opacity.
+- 44px, Card Stock, 1.5px ink border, 4px corners, 16px text (14px from md). Focus fills with paper plus the cobalt outline; invalid switches the border to correction red. The caret is live red. The search `Command` list shares the same border, and its selected item inverts to ink fill.
 
-### Segmented Choice (mode and kind selectors)
-Two-up grid inside a 14px-radius container with a 40% background wash; the selected option fills amethyst, the other is muted text that brightens on hover. It is an `aria-pressed` button pair, not tabs.
+### Badges and chosen items
+- 28px, 12px bold uppercase, 4px-ish corners; default is ink fill, outline uses 40% ink border. Picked artists and genres are ink-filled 44px pills with a 44px remove target.
 
-### Member Row
-A 14px-radius card row with a 36px amethyst-tinted initial avatar, name with a Crown Amber crown for the leader, optional Last.fm line, a status badge ("Pronto", "Votou", "Aguardando"), and an overflow menu.
+### Vote tiles
+- Two columns (three from 640px) of boxes with cover, title, artist and a mark. The picked tile inverts to full ink with a filled mark. Unpicked tiles carry the empty outlined square. Tiles enter with a 60ms stagger, 0.35s.
 
-### Roulette (signature)
-A 176px-tall, 18px-radius frame holding a horizontal strip of 132px covers separated by 10px, edge-masked to transparent at both ends. A 2px amethyst needle with a glow runs through the center, capped by amethyst triangles at top and bottom. The strip accelerates and decelerates over 7s (ease `[0.1, 0.75, 0.12, 1]`), then non-winners fade to 30% opacity and 50% saturation while the winner scales to 1.05 with a Winner Halo. Each cover carries a 4px rarity edge. Respects `prefers-reduced-motion` by jumping to the result.
+### Roulette
+- A tape of covers (132px wide, 10px gap) slides under a fixed 2px ink needle with a red triangle tip, over a recessed muted window with a ruler strip along the top. It runs 7 seconds on a hard-decelerating curve, then the winner scales to 1.05 with a 3px ink ring while the rest dim to 35% and greyscale. Caption flips from "Sorteando..." to "Album da noite". Under reduced motion it jumps to the result.
 
-### Album Card (signature)
-A card with a 260px cover (14px radius, Cover Lift) beside the title, artist, meta line, genre badges, streaming link buttons, and a collapsible tracklist (max 64 height, scroll). It enters with a spring (stiffness 160, damping 18) from 24px below.
+### Logo and Masthead
+- **Mark:** a 32px ink square with a 6px-of-64 corner (the favicon uses 8), a paper disc inside, a groove ring and centre hole in ink, and a small Live Red dot at the top-right corner outlined in paper. The disc and outline follow the page paper; the favicon repeats the mark with literal colours (#15171c ink, #f2f3f6 paper, #dc2a2b red).
+- **Lockup:** mark, 10px gap, then the wordmark in condensed 62% caps. The masthead strip is lockup, then the long-form date, then the sound icon on the right, closed by a 3px ink rule. No invite button lives there.
+- **Rules:** the red dot is the same Live Red as the AGORA dot and never changes; the mark never takes You Blue or any other colour; no gradients, glow or extra detail are added to the disc.
 
-### Vote Tile
-A cover-forward tile (title and artist beneath) in a 2 or 3 column grid; staggered spring entrance, lifts 4px on hover, shrinks to 0.97 on press. The chosen tile gets the Vote Halo and an amethyst tick badge top-right.
+### Sound
+- Web Audio only, no files, master gain 0.6 through a limiter. Pen-click on every button or option, per-cover teleprinter tick with a looping noise tape during the spin, a stamp thud on a vote or a ready mark, a two-note join chime, a low buzz on error, and a stamp plus a short bell-like chord when the tape locks on the winner. The Som toggle sits in the masthead as an icon only: a 44px square, 1.5px ink border, card fill, Volume2 or VolumeX, fixed aria-label "Som" with aria-pressed carrying the state. It starts off and remembers a change once made.
+
+### History
+- Covers in a 3 to 6 column grid, each under a 3px ink rule, with title and artist truncated.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** let the album cover be the brightest, most colorful object on screen.
-- **Do** keep amethyst to one purpose per screen (The One Lamp Rule).
-- **Do** use the 14px / 10px radius pair and the 1px translucent ring for surfaces.
-- **Do** use springs for entrances and the 7s deceleration curve for the roulette; honor `prefers-reduced-motion`.
-- **Do** keep copy in informal Brazilian Portuguese with progressive verbs for waiting states ("Garimpando álbuns 2/6…").
-- **Do** keep the page single-column and phone-first, touch targets at least 32px.
+- **Do** keep the page paper, ink and rules, and let the blue "you" be the only colour field.
+- **Do** show state with the filled, hatched and dash marks, and keep the legend under the grid.
+- **Do** set h1-h3 and the AGORA line in Archivo at wdth 62, weight 800, uppercase, line-height about 0.9; set everything else at normal width.
+- **Do** use 1.5px ink borders, 4px corners, and 0 radius with a 6px top rule for program boxes.
+- **Do** keep touch targets at 44px or more and rows at 56px.
+- **Do** put light ink (you-ink) on You Blue fills.
+- **Do** keep the live red to the dot, the needle tip and the caret, and reserve motion for stamps, band entrances, the pulse and the roulette.
 
 ### Don't:
-- **Don't** introduce a light theme, a second accent hue, or a gradient text treatment.
-- **Don't** add decorative glows to resting surfaces; glow marks a decision.
-- **Don't** use pure black or pure white backgrounds; stay on the violet-tinted graphite.
-- **Don't** add a second typeface or serif display for flavor.
-- **Don't** use identical icon-plus-heading-plus-blurb card grids; the product is sections and covers, not feature tiles.
-- **Don't** hide state: whose turn it is, who is ready, and who has voted must always be visible.
+- **Don't** reintroduce the radio world: no teal, amber, brass, glass, blur, dials or valve imagery.
+- **Don't** add decoration with no job (the No-Decoration-Without-a-Job Rule): grain is paper, halftone is the print band, rules separate; nothing else ornamental.
+- **Don't** give other people their own colours: per-person channel colours were tried and rejected.
+- **Don't** use neon, glow, gradients as surfaces, or dark-mode music-app styling.
+- **Don't** encode state or status in hue, or colour anything that is not you or the live step.
+- **Don't** add a second typeface or fake a display face with fills or shadows.
+- **Don't** lift surfaces with shadows; the popover shadow is the only one.
+- **Don't** put a decorative eyebrow or kicker above headings; the "Agora:" lead belongs to the one-step line, not to section titles.
