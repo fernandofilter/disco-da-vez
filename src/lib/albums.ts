@@ -1,6 +1,6 @@
 import { pickAlbums, shuffle, type Candidate } from './draw'
 import { lastfmEnabled, topAlbumsByTag, userListened } from './lastfm'
-import { artistAlbums, genreAlbums, hasCover, resolveAlbum } from './musicbrainz'
+import { artistAlbums, choiceToAlbum, genreAlbums, hasCover, resolveAlbum } from './musicbrainz'
 import type { Album, Choice, DrawResult, Member, Mode } from './types'
 
 const own = (a: Album): Candidate => ({ key: a.id, album: a, resolve: async () => a })
@@ -30,7 +30,7 @@ async function genrePool(genre: string): Promise<Candidate[]> {
 /** Pool de candidatos de uma escolha; artista fica em cache, gênero sorteia uma página nova a cada chamada. */
 export function poolFor(mode: Mode) {
   return async (choice: Choice): Promise<Candidate[]> =>
-    mode === 'artist' ? (await artistAlbums(choice)).map(own) : genrePool(choice.name)
+    mode === 'album' ? [own(choiceToAlbum(choice))] : mode === 'artist' ? (await artistAlbums(choice)).map(own) : genrePool(choice.name)
 }
 
 /** Capa existe e nenhum membro com Last.fm vinculado já escutou o álbum. */

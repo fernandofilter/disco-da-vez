@@ -1,10 +1,10 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Disc3, KeyRound } from 'lucide-react'
-import { useState } from 'react'
+import { ArrowLeft, ArrowRight, Disc3, Headphones, KeyRound, Mic, Shuffle, Users } from 'lucide-react'
+import { lazy, Suspense, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { LastfmIcon } from '@/components/Brand'
-import { BRAND, Masthead, SoundToggle, TarjaBand } from '@/components/Guide'
+import { BRAND, Masthead, SoundToggle } from '@/components/Guide'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -31,6 +31,9 @@ export const rememberGroup = (id: string, name: string) => {
 
 // o código do grupo é o id dele (o mesmo do link de convite): aceita o código puro ou o link colado
 const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+
+// three.js só carrega na tela inicial, depois do primeiro desenho
+const Vinyl = lazy(() => import('@/components/Vinyl'))
 
 type View = 'start' | 'create' | 'join'
 const EASE = [0.22, 1, 0.36, 1] as const
@@ -90,13 +93,21 @@ export default function Home() {
         <SoundToggle />
       </Masthead>
 
-      <section className="grid gap-6 py-8 sm:py-12 md:grid-cols-[auto_minmax(0,26rem)] md:items-end md:justify-between md:gap-12">
-        <motion.h1 {...rise(0)} className="text-[clamp(3.6rem,17vw,6rem)]">{BRAND}</motion.h1>
-        <motion.p {...rise(0.12)} className="text-lg font-medium leading-snug">
-          Monte um grupo com os amigos, cada um joga suas bandas ou gêneros favoritos e a roleta escolhe o álbum que todo mundo escuta, discute e descobre junto.
-        </motion.p>
+      <section className="grid items-center gap-4 py-6 sm:py-10 md:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] md:gap-10">
+        <div className="space-y-6">
+          <motion.h1 {...rise(0)} className="text-[clamp(3.6rem,17vw,6rem)]">{BRAND}</motion.h1>
+          <motion.p {...rise(0.12)} className="max-w-[26rem] text-lg font-medium leading-snug">
+            Monte um grupo com os amigos, cada um joga suas bandas ou gêneros favoritos e a roleta escolhe o álbum que todo mundo escuta, discute e descobre junto.
+          </motion.p>
+        </div>
+        <motion.div {...rise(0.2)} aria-hidden className="relative aspect-[5/4] w-full">
+          {/* disco vermelho impresso em meio-tom: a cor da página, atrás do vinil */}
+          <div className="halftone absolute right-[4%] top-1/2 aspect-square h-[92%] -translate-y-1/2 rounded-full bg-you after:rounded-full" />
+          <Suspense fallback={null}>
+            <Vinyl />
+          </Suspense>
+        </motion.div>
       </section>
-      <TarjaBand />
 
       <AnimatePresence mode="wait" initial={false}>
         {view === 'start' ? (
@@ -109,7 +120,10 @@ export default function Home() {
                 <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
               </Button>
             </motion.div>
-            {mine.length > 0 && <SavedGroups items={mine} />}
+            <div className={cn('grid gap-10', mine.length > 0 && 'md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-12')}>
+              <Steps />
+              {mine.length > 0 && <SavedGroups items={mine} />}
+            </div>
           </motion.div>
         ) : (
           <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className={cn('mt-10 grid gap-10', mine.length > 0 && 'md:grid-cols-2 md:gap-12')}>
@@ -149,6 +163,34 @@ export default function Home() {
         )}
       </AnimatePresence>
     </main>
+  )
+}
+
+const STEPS = [
+  { icon: Users, title: 'Monte o grupo', text: 'Crie o grupo e mande o link para 2 a 6 amigos. Sem cadastro: só um nome.' },
+  { icon: Mic, title: 'Cada um escolhe', text: 'Cada pessoa joga até 5 bandas, artistas ou gêneros que gostaria de ouvir.' },
+  { icon: Shuffle, title: 'Sorteio ou votação', text: 'O líder decide: uma roleta sorteia o álbum, ou o grupo vota em segredo entre 6 opções.' },
+  { icon: Headphones, title: 'Ouçam juntos', text: 'Abram o álbum inteiro e conversem depois. Álbum que já saiu nunca mais volta.' },
+]
+
+/** Como a rodada funciona, em quatro passos de grade. */
+function Steps() {
+  return (
+    <section aria-label="Como funciona" className="space-y-3 border-t-[3px] border-foreground pt-3">
+      <h2 className="text-3xl">Como funciona</h2>
+      <ol className="box divide-y divide-foreground/20 overflow-hidden">
+        {STEPS.map((s, i) => (
+          <motion.li key={s.title} {...rise(0.4 + i * 0.08)} className="grid min-h-16 grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-x-3">
+            <span className="tnum grid place-self-stretch place-items-center border-r border-foreground/20 text-3xl font-extrabold" style={{ fontStretch: '62%' }}>{i + 1}</span>
+            <div className="py-3">
+              <h3 className="text-xl">{s.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{s.text}</p>
+            </div>
+            <s.icon aria-hidden className="mr-4 size-6" />
+          </motion.li>
+        ))}
+      </ol>
+    </section>
   )
 }
 

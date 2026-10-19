@@ -84,6 +84,22 @@ export async function searchArtists(q: string): Promise<Choice[]> {
   return r.artists.filter((a) => (a.score ?? 100) >= 60).map((a) => ({ id: a.id, name: a.name, sub: [a.disambiguation, a.country].filter(Boolean).join(' · ') || undefined }))
 }
 
+/** Busca de álbum por título ou artista; o resultado já carrega título, artista e ano. */
+export async function searchAlbums(q: string): Promise<Choice[]> {
+  const t = lucene(q)
+  if (t.length < 2) return []
+  const r = await mb<{ 'release-groups': (RG & { score?: number })[] }>('/release-group', {
+    query: `(releasegroup:(${t}) OR artist:(${t})) AND primarytype:album`,
+    limit: 15,
+  })
+  return dedupeAlbums(r['release-groups'].filter((rg) => (rg.score ?? 100) >= 50 && usable(rg)).map((rg) => toAlbum(rg)))
+    .slice(0, 8)
+    .map((a) => ({ id: a.id, name: a.title, sub: a.artist, year: a.year }))
+}
+
+/** O álbum escolhido vira Album sem novas consultas. */
+export const choiceToAlbum = (c: Choice): Album => ({ id: c.id, title: c.name, artist: c.sub ?? '?', year: c.year })
+
 const discographies = new Map<string, Promise<Album[]>>()
 
 /** Álbuns do artista (EPs e singles são outros tipos primários e ficam de fora). */

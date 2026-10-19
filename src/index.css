@@ -171,6 +171,18 @@
     opacity: 0.4;
   }
 
+  /* ---------- etapas da rodada: feita = tinta, agora = vermelho, falta = hachura */
+  .slot[data-state='done'] {
+    background: var(--foreground);
+  }
+  .slot[data-state='now'] {
+    background: var(--you);
+  }
+  .slot[data-state='next'] {
+    background: repeating-linear-gradient(45deg, oklch(0.17 0.012 262 / 0.35) 0 1.5px, transparent 1.5px 5px);
+    border: 1.5px solid oklch(0.17 0.012 262 / 0.35);
+  }
+
   /* ---------- faixa de meio-tom: seis vagas, uma delas é você */
   .halftone {
     position: relative;
