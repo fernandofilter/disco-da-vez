@@ -35,13 +35,7 @@ export function Stages({ round, current }: { round: number; current: number }) {
       <ol className="grid grid-cols-4 gap-1.5">
         {STAGES.map((s, i) => (
           <li key={s} aria-current={i === current ? 'step' : undefined} className="space-y-1.5">
-            <div className="halftone h-3.5">
-              <span
-                className="slot block size-full"
-                data-state={i < current ? 'done' : i === current ? 'now' : 'next'}
-                style={i === current ? { transformOrigin: 'left', animation: 'band-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both' } : undefined}
-              />
-            </div>
+            <span className="slot block h-4" data-state={i < current ? 'done' : i === current ? 'now' : 'next'} />
             <p className={cn('truncate text-xs font-bold uppercase tracking-wide', i === current ? 'text-foreground' : 'text-muted-foreground')}>
               <span className="tnum">{i + 1}</span> {s}
             </p>
