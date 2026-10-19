@@ -6,6 +6,7 @@ import { GroupView } from '@/components/GroupView'
 import { Roulette } from '@/components/Roulette'
 import { VotePanel } from '@/components/VotePanel'
 import { Button } from '@/components/ui/button'
+import { Rounds } from '@/pages/History'
 import { shuffle } from '@/lib/draw'
 import { artistAlbums, searchArtists } from '@/lib/musicbrainz'
 import type { GroupState } from '@/hooks/useGroup'
@@ -34,7 +35,12 @@ function Room({ scenario }: { scenario: string }) {
   const choices: RoundChoice[] = round
     ? members.map((m, i) => ({ round_id: 'r1', member_id: m.id, items: [{ id: `a${i}`, name: ['Radiohead', 'Björk', 'Os Mutantes'][i % 3] }], ready: i % 2 === 1, voted: i === 1 || i === 2 }))
     : []
-  const data: GroupState = { userId: 'u0', group: { id: 'abc123', name: 'Clube da Quinta', leader_id: 'u0', last_mode: 'artist', last_kind: 'draw' }, members, me: members[0], round, choices, votes: scenario === 'voting' && albums[1] ? [{ round_id: 'r1', member_id: 'm0', album_id: albums[1].id }] : [], history: [] }
+  const data: GroupState = { userId: 'u0', group: { id: 'abc123', name: 'Clube da Quinta', leader_id: 'u0', last_mode: 'artist', last_kind: 'draw' }, members, me: members[0], round, rounds: round ? [{ id: round.id, kind: round.kind, mode: round.mode, created_at: now }] : [], choices, votes: scenario === 'voting' && albums[1] ? [{ round_id: 'r1', member_id: 'm0', album_id: albums[1].id }] : [], history: [] }
+  if (scenario === 'history') {
+    const metas = albums.slice(0, 3).map((_, i) => ({ id: `r${i}`, kind: (i === 1 ? 'vote' : 'draw') as Round['kind'], mode: 'artist' as const, created_at: now }))
+    const done = albums.slice(0, 3).map((album, i) => ({ id: `h${i}`, album_id: album.id, album, round_id: `r${i}`, confirmed_at: now })).reverse()
+    return <Rounds data={{ ...data, rounds: metas, history: done }} />
+  }
   return (
     <>
       <GroupView data={data} refresh={() => {}} />

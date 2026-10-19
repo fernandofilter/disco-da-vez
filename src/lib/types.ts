@@ -1,4 +1,4 @@
-export type Mode = 'artist' | 'genre'
+export type Mode = 'artist' | 'genre' | 'album'
 export type Kind = 'draw' | 'vote'
 export type RoundStatus = 'choosing' | 'drawing' | 'voting' | 'done'
 
@@ -10,11 +10,13 @@ export interface Album {
   year?: string
 }
 
-/** Escolha de um membro: artista (id = mbid) ou gênero (id = nome do gênero). */
+/** Escolha de um membro: artista (id = mbid), gênero (id = nome do gênero) ou álbum (id = release-group, name = título, sub = artista). */
 export interface Choice {
   id: string
   name: string
   sub?: string
+  /** Só em álbuns: o ano, para montar o Album sem nova consulta. */
+  year?: string
 }
 
 export interface Group {
@@ -76,7 +78,16 @@ export interface HistoryItem {
   id: string
   album_id: string
   album: Album
+  round_id: string | null
   confirmed_at: string
+}
+
+/** Só o que o histórico e a numeração (#1, #2…) precisam de cada rodada, em ordem de criação. */
+export interface RoundMeta {
+  id: string
+  kind: Kind
+  mode: Mode
+  created_at: string
 }
 
 export interface AlbumDetails {

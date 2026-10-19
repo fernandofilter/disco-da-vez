@@ -1,16 +1,22 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, Loader2, Pencil, X } from 'lucide-react'
+import { Check, Disc3, Loader2, Mic, Pencil, Tags, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import genres from '@/data/genres.json'
 import { api } from '@/lib/api'
-import { artistAlbums, searchArtists } from '@/lib/musicbrainz'
+import { artistAlbums, hasCover, searchAlbums, searchArtists } from '@/lib/musicbrainz'
 import { sfx } from '@/lib/sound'
 import type { Choice, Mode } from '@/lib/types'
 import { Button } from './ui/button'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command'
 
 const MAX = 5
+
+const COPY: Record<Mode, { many: string; search: string; icon: typeof Mic }> = {
+  artist: { many: 'bandas/artistas', search: 'Buscar banda ou artista…', icon: Mic },
+  genre: { many: 'gêneros', search: 'Buscar gênero (ex.: post-rock, shoegaze)…', icon: Tags },
+  album: { many: 'álbuns', search: 'Buscar álbum ou artista…', icon: Disc3 },
+}
 
 interface Props {
   roundId: string
@@ -27,6 +33,8 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
   const [searching, setSearching] = useState(false)
   const [checking, setChecking] = useState<string | null>(null)
   const [locked, setLocked] = useState(ready)
+  const copy = COPY[mode]
+  const Icon = copy.icon
 
   // o servidor é a fonte da verdade quando a rodada muda ou o líder volta para as escolhas
   useEffect(() => {
@@ -35,10 +43,10 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
   }, [roundId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (mode !== 'artist' || query.trim().length < 2) return setFound([])
+    if (mode === 'genre' || query.trim().length < 2) return setFound([])
     setSearching(true)
     const t = setTimeout(() => {
-      searchArtists(query).then(setFound, () => setFound([])).finally(() => setSearching(false))
+      ;(mode === 'artist' ? searchArtists : searchAlbums)(query).then(setFound, () => setFound([])).finally(() => setSearching(false))
     }, 450)
     return () => clearTimeout(t)
   }, [query, mode])
@@ -49,7 +57,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
     return (genres as string[]).filter((g) => g.includes(q)).slice(0, 8).map((g) => ({ id: g, name: g }))
   }, [query])
 
-  const options = (mode === 'artist' ? found : (genreMatches as Choice[])).filter((o) => !items.some((i) => i.id === o.id))
+  const options = (mode === 'genre' ? (genreMatches as Choice[]) : found).filter((o) => !items.some((i) => i.id === o.id))
 
   const save = (next: Choice[], isReady: boolean) => {
     setItems(next)
@@ -61,11 +69,12 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
 
   async function add(c: Choice) {
     if (items.length >= MAX) return toast.info(`Máximo de ${MAX} escolhas.`)
-    if (mode === 'artist') {
+    if (mode !== 'genre') {
       setChecking(c.id)
       try {
-        // já aquece o cache usado no sorteio; artista só com EP/single não serve
-        if (!(await artistAlbums(c)).length) return toast.error(`${c.name} não tem álbuns completos (só EPs/singles).`)
+        // já aquece o cache usado no sorteio; artista só com EP/single não serve, e álbum sem capa não entra na roleta
+        if (mode === 'artist' && !(await artistAlbums(c)).length) return toast.error(`${c.name} não tem álbuns completos (só EPs/singles).`)
+        if (mode === 'album' && !(await hasCover(c.id))) return toast.error(`${c.name} não tem capa disponível. Escolha outro álbum.`)
       } catch {
         return toast.error('Não consegui consultar o MusicBrainz agora. Tente de novo.')
       } finally {
@@ -83,7 +92,8 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
           {items.map((c) => (
             <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
               <span className="flex h-11 items-center gap-1 rounded-sm border-[1.5px] border-foreground bg-foreground pl-3 text-base font-bold text-background">
-                {c.name}
+                <Icon className="mr-1 size-4 shrink-0" aria-hidden />
+                {c.name}{mode === 'album' && c.sub && <span className="ml-1 max-w-40 truncate text-sm font-medium opacity-70">· {c.sub}</span>}
                 {!locked && (
                   <button aria-label={`Remover ${c.name}`} className="flex size-11 items-center justify-center hover:bg-background/15" onClick={() => save(items.filter((i) => i.id !== c.id), false)}>
                     <X className="size-4" />
@@ -94,7 +104,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
             </motion.div>
           ))}
         </AnimatePresence>
-        {items.length === 0 && <p className="self-center text-sm text-muted-foreground">Escolha de 1 a {MAX} {mode === 'artist' ? 'bandas/artistas' : 'gêneros'}.</p>}
+        {items.length === 0 && <p className="self-center text-sm text-muted-foreground">Escolha de 1 a {MAX} {copy.many}.</p>}
       </div>
 
       {locked ? (
@@ -104,7 +114,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
       ) : (
         <>
           <Command shouldFilter={false}>
-            <CommandInput value={query} onValueChange={setQuery} placeholder={mode === 'artist' ? 'Buscar banda ou artista…' : 'Buscar gênero (ex.: post-rock, shoegaze)…'} disabled={items.length >= MAX} />
+            <CommandInput value={query} onValueChange={setQuery} placeholder={copy.search} disabled={items.length >= MAX} />
             {(query.trim().length >= 2 || options.length > 0) && (
               <CommandList>
                 {searching || checking ? (
@@ -115,7 +125,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
                 {options.map((o) => (
                   <CommandItem key={o.id} value={o.id} onSelect={() => add(o)}>
                     <span className="max-w-[60%] shrink-0 truncate">{o.name}</span>
-                    {o.sub && <span className="ml-2 min-w-0 truncate text-xs opacity-70">{o.sub}</span>}
+                    {o.sub && <span className="ml-2 min-w-0 truncate text-xs opacity-70">{o.sub}{o.year ? ` · ${o.year}` : ''}</span>}
                   </CommandItem>
                 ))}
               </CommandList>

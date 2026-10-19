@@ -7,6 +7,7 @@ import type { Group, Member, Round, RoundChoice } from '@/lib/types'
 import { sfx } from '@/lib/sound'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
+import { LastfmIcon } from './Brand'
 import { Mark } from './Guide'
 import type { MarkState } from './Guide'
 
@@ -68,7 +69,7 @@ export function MemberList({ group, members, me, isLeader, manage, active, choic
                       {leader && <Crown className="size-4 shrink-0" aria-label="Líder" />}
                       {m.id === me.id && <span className="text-xs font-medium opacity-80">(você)</span>}
                     </p>
-                    {m.lastfm_user && <p className="truncate text-xs opacity-80">Last.fm: {m.lastfm_user}</p>}
+                    {m.lastfm_user && <p className="flex items-center gap-1 truncate text-xs opacity-80"><LastfmIcon className="size-3.5" label="Last.fm" /> {m.lastfm_user}</p>}
                   </div>
                 </div>
                 {cols.map((c) => {

@@ -1,6 +1,6 @@
 ---
 name: Disco da Vez
-description: A printed TV-programming grid for a group's album night. Newsprint, ink rules, and one blue for you.
+description: A printed TV-programming grid for a group's album night. Newsprint, ink rules, and one red for you.
 colors:
   paper: "oklch(0.965 0.007 250)"
   card: "oklch(0.99 0.004 250)"
@@ -14,7 +14,7 @@ colors:
   rule: "oklch(0.17 0.012 262 / 0.2)"
   live: "oklch(0.58 0.22 27)"
   destructive: "oklch(0.5 0.21 27)"
-  you: "oklch(0.5 0.21 262)"
+  you: "oklch(0.5 0.21 27)"
   you-ink: "oklch(0.99 0 0)"
 typography:
   masthead:
@@ -26,7 +26,7 @@ typography:
     fontVariation: "'wdth' 62"
   agora:
     fontFamily: "Archivo Variable, system-ui, sans-serif"
-    fontSize: "2.25rem (3.75rem from 640px)"
+    fontSize: "1.5rem (2.25rem from 640px)"
     fontWeight: 800
     lineHeight: 0.92
     fontVariation: "'wdth' 62"
@@ -118,7 +118,7 @@ The previous valve-radio world was rejected as too decorative; its teal, amber, 
 
 **Key Characteristics:**
 - Newsprint paper, near-black ink, 1.5px ruled boxes, thick top rule on program boxes.
-- One accent, blue, for "you" only, plus the red live dot.
+- One accent, red, for "you" only, plus the red live dot.
 - One typeface, Archivo Variable; width axis does the work of a second family.
 - State as shape: filled square, hatched square, dash.
 - Flat depth; one soft shadow, on the popover menu only.
@@ -126,13 +126,13 @@ The previous valve-radio world was rejected as too decorative; its teal, amber, 
 
 ## Colors
 
-A near-monochrome newsprint palette with one spot-ink blue for you and one red for live.
+A near-monochrome newsprint palette with one spot-ink red for you and one red for live.
 
 ### Primary
 - **Press Ink** (ink): the single working colour. Text, rules, borders, primary buttons, selected tiles, the filled "done" mark, selection highlight, scrollbar.
 
 ### Secondary
-- **You Blue** (you, with you-ink text): flat cobalt for the signed-in person only: their row in the grid, their chip in the AGORA row, the first slot of the six-slot band. The focus ring reuses its value.
+- **You Red** (you, with you-ink text): flat red for the signed-in person only: their row in the grid, their chip in the AGORA row, the first slot of the six-slot band. The focus ring reuses its value.
 - **Live Red** (live): the on-air dot beside the AGORA line, the roulette needle tip, and the text caret. Never used for fills or text.
 
 ### Neutral
@@ -142,10 +142,10 @@ A near-monochrome newsprint palette with one spot-ink blue for you and one red f
 - **Soft Ink** (ink-soft): secondary text, column heads, years, running times.
 - **Hairline Rule** (rule, ink at 20%): row dividers and column separators inside boxes.
 - **Paper Ink** (paper-ink): text on ink fills.
-- **Correction Red** (destructive): destructive buttons and invalid fields only, darker than live red. The focus ring is a 3px outline with 2px offset in the You Blue value, functional rather than decorative.
+- **Correction Red** (destructive): destructive buttons and invalid fields only, darker than live red. The focus ring is a 3px outline with 2px offset in the You Red value, functional rather than decorative.
 
 ### Named Rules
-**The One-Accent-Is-You Rule.** The only colour is the blue that means "you", plus the red live dot. Other people are paper and ink; if a colour does not mark you or the one live step, it is ink or paper.
+**The One-Accent-Is-You Rule.** The only colour is the red that means "you", plus the red live dot. Other people are paper and ink; if a colour does not mark you or the one live step, it is ink or paper.
 
 **The State-Is-Shape Rule.** Done, waiting and not-applicable are a filled square, a hatched square and a dash. Never encode state in hue, and keep the legend visible under any grid that uses the marks.
 
@@ -159,7 +159,7 @@ A near-monochrome newsprint palette with one spot-ink blue for you and one red f
 
 ### Hierarchy
 - **Masthead** (800, wdth 62, uppercase, clamp(3.6rem, 19vw, 6rem), 0.9): the Home title only.
-- **AGORA line** (800, wdth 62, uppercase, 2.25rem rising to 3.75rem at 640px, 0.92): the one next step, led by a muted "Agora:" and the live dot.
+- **AGORA line** (800, wdth 62, uppercase, 1.5rem rising to 2.25rem at 640px, 0.92): the one next step, led by a muted "Agora:" and the live dot.
 - **Headline** (800, wdth 62, uppercase, 3rem to 3.75rem, 0.9): the program (album) title. Section titles use 1.875rem. All h1-h3 take this treatment from base CSS.
 - **Brand** (800, wdth 62, uppercase, about 26px / 1.65rem): the "Disco da Vez" wordmark next to the logo mark in the masthead strip, beside the long-form date in 14px medium Soft Ink.
 - **Body** (400-600, 16px, 1.5): form fields, names (700), buttons (600), copy up to about 26rem measure on Home.
@@ -174,7 +174,7 @@ A single column of ruled bands, capped at max-w-6xl (72rem) with 16px side paddi
 
 The "Pessoas" section is fully available only before a round starts: the people menu, "Copiar convite", "Meu perfil" and leader claim all live there. During choosing and voting it is a read-only grid with no menu column. On the draw screen (drawing) it is not rendered at all, and the content column spans the full width on desktop.
 
-The people grid is a table of ruled rows: the name sits in a card-stock cell (your own row is filled You Blue), then fixed 72px columns (Escolhas, Voto) hold marks, then a 44px menu cell (only before a round starts). Tracks in the album card use a 2rem number, a flexible title and right-aligned running times, like an inlay card.
+The people grid is a table of ruled rows: the name sits in a card-stock cell (your own row is filled You Red), then fixed 72px columns (Escolhas, Voto) hold marks, then a 44px menu cell (only before a round starts). Tracks in the album card use a 2rem number, a flexible title and right-aligned running times, like an inlay card.
 
 ## Elevation & Depth
 
@@ -199,7 +199,7 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - **Hover / Focus:** fill shifts (primary to 85% ink, outline to muted) over 150ms; focus is a 3px cobalt outline with 2px offset. Disabled drops to 45% opacity.
 
 ### The Grade (people grid)
-- One row per person: card-stock name cell (the signed-in person's row is solid You Blue with light ink), crown icon for the leader, a "(você)" tag, optional Last.fm line.
+- One row per person: card-stock name cell (the signed-in person's row is solid You Red with light ink), crown icon for the leader, a "(você)" tag, optional Last.fm line.
 - Columns of 72px with the shape marks; a header row in Soft Ink uppercase 12px; a legend row under the box. Marks are announced with aria-labels.
 - Motion: a "done" mark stamps in (scale 1.7 to 1, 0.22s). Rows fade in and out with layout animation.
 
@@ -207,7 +207,7 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - Filled ink square = done; 45-degree hatched square = waiting; short 2px dash at 40% = not applicable; hollow = empty (the unpicked vote tile). Corner chips on person initials use the same marks on a card-coloured square.
 
 ### AGORA line and Chips
-- The live dot pulses outward (tally, 2s ease-out, loops) beside the 62% caps line. Beneath it, 36px square chips carry each person's initial with a mark at the corner; your chip is blue, the others are card stock with a 1.5px ink border.
+- The live dot pulses outward (tally, 2s ease-out, loops) beside the 62% caps line. Beneath it, 36px square chips carry each person's initial with a mark at the corner; your chip is red, the others are card stock with a 1.5px ink border.
 
 ### Program Box
 - Card Stock fill, 1.5px ink border, 0 radius, 6px top rule, 16 to 20px padding. Holds the album (cover, title, artist, a meta line, outline badges, listen buttons, a ruled tracklist `details`) and the Create group form.
@@ -227,7 +227,7 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 ### Logo and Masthead
 - **Mark:** a 32px ink square with a 6px-of-64 corner (the favicon uses 8), a paper disc inside, a groove ring and centre hole in ink, and a small Live Red dot at the top-right corner outlined in paper. The disc and outline follow the page paper; the favicon repeats the mark with literal colours (#15171c ink, #f2f3f6 paper, #dc2a2b red).
 - **Lockup:** mark, 10px gap, then the wordmark in condensed 62% caps. The masthead strip is lockup, then the long-form date, then the sound icon on the right, closed by a 3px ink rule. No invite button lives there.
-- **Rules:** the red dot is the same Live Red as the AGORA dot and never changes; the mark never takes You Blue or any other colour; no gradients, glow or extra detail are added to the disc.
+- **Rules:** the red dot is the same Live Red as the AGORA dot and never changes; the mark never takes You Red or any other colour; no gradients, glow or extra detail are added to the disc.
 
 ### Sound
 - Web Audio only, no files, master gain 0.6 through a limiter. Pen-click on every button or option, per-cover teleprinter tick with a looping noise tape during the spin, a stamp thud on a vote or a ready mark, a two-note join chime, a low buzz on error, and a stamp plus a short bell-like chord when the tape locks on the winner. The Som toggle sits in the masthead as an icon only: a 44px square, 1.5px ink border, card fill, Volume2 or VolumeX, fixed aria-label "Som" with aria-pressed carrying the state. It starts off and remembers a change once made.
@@ -238,12 +238,12 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep the page paper, ink and rules, and let the blue "you" be the only colour field.
+- **Do** keep the page paper, ink and rules, and let the red "you" be the only colour field.
 - **Do** show state with the filled, hatched and dash marks, and keep the legend under the grid.
 - **Do** set h1-h3 and the AGORA line in Archivo at wdth 62, weight 800, uppercase, line-height about 0.9; set everything else at normal width.
 - **Do** use 1.5px ink borders, 4px corners, and 0 radius with a 6px top rule for program boxes.
 - **Do** keep touch targets at 44px or more and rows at 56px.
-- **Do** put light ink (you-ink) on You Blue fills.
+- **Do** put light ink (you-ink) on You Red fills.
 - **Do** keep the live red to the dot, the needle tip and the caret, and reserve motion for stamps, band entrances, the pulse and the roulette.
 
 ### Don't:
@@ -255,3 +255,17 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - **Don't** add a second typeface or fake a display face with fills or shadows.
 - **Don't** lift surfaces with shadows; the popover shadow is the only one.
 - **Don't** put a decorative eyebrow or kicker above headings; the "Agora:" lead belongs to the one-step line, not to section titles.
+
+## Addendum: entry screen, brand icons, favicon
+
+- **Entry screen (Home):** masthead title, one-line pitch, then two buttons: "Criar grupo" (primary) and "Entrar em um grupo" (outline). Both turn You Red on hover and their icons move lightly (the disc turns, the key tilts). Below sit the ruled 4-step "Como funciona" table and the saved groups. Choosing a button swaps in its form card with a "Voltar" button. There is no halftone band on Home and no "where to listen" box.
+- **Join by code:** the group code is the group id (same as the invite link). The group room has "Copiar código" beside "Copiar convite"; "Entrar em um grupo" accepts the code or a pasted link and checks it before navigating.
+- **Vinyl (Home hero, `Vinyl.tsx`, three.js):** a decorative 3D record sliding out of a "Disco da Vez" sleeve, over a flat You Red circle with halftone overprint. It spins, carries a cool/warm sheen, follows the pointer slightly and bobs. Lazy-loaded after first paint, aria-hidden, paused off-screen and when the tab is hidden; with reduced motion it renders one still frame. This is the one place a second colour family appears (the cool/warm sheen), and it is light, not a fill.
+- **Group room, before and during a round:** the group name is a section-sized headline (`clamp(2.25rem, 9vw, 3.75rem)`). Under it sits the **Stages** bar: "Rodada #N" plus four slots (Convidar, Escolher, Decidir, Ouvir): done = solid You Red block, current = You Red stripes sliding (the only moving one), upcoming = empty grey block. Round numbers (#1, #2...) are the creation order of the group's rounds and also appear in the AGORA line, the setup title/button and section hints.
+- **New round card:** "Decidir por" (Sorteio, Votação) comes first, then "Escolher por" (Bandas/artistas, Gêneros, Álbuns). Options are plain ink-filled / outlined buttons with a lucide icon; no state squares. In album mode each person searches and picks up to 5 albums (cover required) and the system draws or opens the vote from the pooled picks. An icon-only dice button beside "Iniciar rodada" randomizes both settings. Album mode needs `supabase/migrations/0002_album_mode.sql` applied. The group name has no explanatory text under it.
+- **Equal buttons:** paired actions (Copiar convite/código, Escolher por, Decidir por, the draw actions) sit in `auto-fit` grids: equal width, fixed height, `nowrap`; when two do not fit they stack, never wrap their label.
+- **History screen (`/g/:id/historico`):** every confirmed round, newest first: "#N" numeral, cover, title, artist, kind/mode/date and Spotify and YouTube Music links. "Já ouvimos" no longer lives in the room; a "Histórico" button in the masthead opens this screen.
+- **Cursor:** every button, `summary` and role=button shows the pointer cursor (global base rule).
+- **Brand icons (`Brand.tsx`):** Spotify and YouTube Music are authored one-colour marks; Last.fm is the official Simple Icons `lastdotfm` path. All use currentColor, so they stay ink on paper and invert on ink buttons. No brand colours.
+- **Roulette:** after the tape locks on the winner it holds 1.6s, then leaves and only the album card remains. The lobby shows the result only.
+- **Favicon:** `public/favicon.svg` is the source; `node scripts/make-icons.mjs` regenerates `favicon.ico`, `icon-192.png`, `icon-512.png` and `apple-touch-icon.png`.

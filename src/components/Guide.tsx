@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { Volume2, VolumeX } from 'lucide-react'
 import { useMuted } from '@/lib/sound'
 import { cn } from '@/lib/utils'
@@ -21,6 +22,30 @@ export function TarjaBand({ className }: { className?: string }) {
   )
 }
 
+export const STAGES = ['Convidar', 'Escolher', 'Decidir', 'Ouvir'] as const
+
+/** As quatro etapas da rodada na faixa de meio-tom: as feitas em tinta, a atual em vermelho, as que faltam hachuradas. Mostra o número da rodada. */
+export function Stages({ round, current }: { round: number; current: number }) {
+  return (
+    <div className="space-y-2" role="group" aria-label={`Rodada ${round}, etapa ${current + 1} de ${STAGES.length}: ${STAGES[current]}`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="tnum text-2xl font-extrabold uppercase leading-none" style={{ fontStretch: '62%' }}>Rodada #{round}</p>
+        <p className="tnum text-xs font-bold uppercase tracking-wide text-muted-foreground">Etapa {current + 1} de {STAGES.length}</p>
+      </div>
+      <ol className="grid grid-cols-4 gap-1.5">
+        {STAGES.map((s, i) => (
+          <li key={s} aria-current={i === current ? 'step' : undefined} className="space-y-1.5">
+            <span className="slot block h-4" data-state={i < current ? 'done' : i === current ? 'now' : 'next'} />
+            <p className={cn('truncate text-xs font-bold uppercase tracking-wide', i === current ? 'text-foreground' : 'text-muted-foreground')}>
+              <span className="tnum">{i + 1}</span> {s}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
 /** Quadradinho de pessoa na linha do AGORA: a inicial e a marca de estado no canto; só o seu é azul. */
 export function Chip({ mine, initial, state }: { mine: boolean; initial: string; state: MarkState }) {
   return (
@@ -34,12 +59,14 @@ export function Chip({ mine, initial, state }: { mine: boolean; initial: string;
 /** O próximo passo de quem está olhando, em uma linha só. */
 export function Agora({ text, children }: { text: string; children?: React.ReactNode }) {
   return (
-    <div className="space-y-3">
-      <p aria-live="polite" className="flex items-start gap-3 text-4xl font-extrabold uppercase leading-[0.92] sm:text-6xl" style={{ fontStretch: '62%' }}>
+    <div className="space-y-2.5">
+      <p aria-live="polite" className="flex items-start gap-2.5 text-2xl font-extrabold uppercase leading-[0.95] sm:text-4xl" style={{ fontStretch: '62%' }}>
         <span aria-hidden className="live-dot mt-[0.12em] text-live" />
         <span>
           <span className="text-muted-foreground">Agora: </span>
-          {text}
+          <motion.span key={text} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+            {text}
+          </motion.span>
         </span>
       </p>
       {children}
@@ -47,10 +74,11 @@ export function Agora({ text, children }: { text: string; children?: React.React
   )
 }
 
-/** Dois botões lado a lado; o escolhido fica em tinta cheia e com quadrado cheio, o outro em contorno. */
-export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; label: string }[]; label: string }) {
+/** Opções de mesma largura; a escolhida fica em tinta cheia, as outras em contorno. */
+export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; label: string; icon?: React.ReactNode }[]; label: string }) {
   return (
-    <div role="group" aria-label={label} className="grid grid-cols-2 gap-2">
+    // colunas de largura igual; se não couberem lado a lado, empilham sem quebrar o texto
+    <div role="group" aria-label={label} className="grid grid-cols-[repeat(auto-fill,minmax(9.25rem,1fr))] gap-2">
       {options.map((o) => {
         const on = value === o.v
         return (
@@ -60,11 +88,11 @@ export function Segmented<T extends string>({ value, onChange, options, label }:
             onClick={() => onChange(o.v)}
             aria-pressed={on}
             className={cn(
-              'flex min-h-11 items-center justify-center gap-2 rounded border-[1.5px] border-foreground px-3 py-2 text-sm font-semibold transition-colors',
+              'flex h-11 min-w-0 items-center justify-center gap-1.5 whitespace-nowrap rounded border-[1.5px] border-foreground px-2.5 text-sm font-semibold transition-colors',
               on ? 'bg-foreground text-background' : 'bg-card hover:bg-muted',
             )}
           >
-            <span aria-hidden className={cn('size-3 shrink-0 border-2 border-current', on && 'bg-current')} />
+            {o.icon && <span aria-hidden className="shrink-0">{o.icon}</span>}
             {o.label}
           </button>
         )

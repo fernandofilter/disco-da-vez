@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '@/lib/api'
 import { ensureSession, supabase } from '@/lib/supabase'
-import type { Group, HistoryItem, Member, Round, RoundChoice, Vote } from '@/lib/types'
+import type { Group, HistoryItem, Member, Round, RoundChoice, RoundMeta, Vote } from '@/lib/types'
 
 export interface GroupState {
   userId: string
@@ -9,6 +9,8 @@ export interface GroupState {
   members: Member[]
   me: Member | null
   round: Round | null
+  /** Todas as rodadas do grupo, da primeira à última: o número de uma rodada é a posição aqui. */
+  rounds: RoundMeta[]
   choices: RoundChoice[]
   votes: Vote[]
   history: HistoryItem[]
@@ -28,10 +30,11 @@ export function useGroup(gid: string) {
       const userId = await ensureSession()
       const { data: group } = await supabase.from('groups').select('*').eq('id', gid).maybeSingle()
       if (!group) return setState({ status: 'outsider' })
-      const [members, rounds, history] = await Promise.all([
+      const [members, rounds, roundList, history] = await Promise.all([
         supabase.from('members').select('*').eq('group_id', gid).order('joined_at'),
         supabase.from('rounds').select('*').eq('group_id', gid).order('created_at', { ascending: false }).limit(1),
-        supabase.from('history').select('id, album_id, album, confirmed_at').eq('group_id', gid).order('confirmed_at', { ascending: false }),
+        supabase.from('rounds').select('id, kind, mode, created_at').eq('group_id', gid).order('created_at'),
+        supabase.from('history').select('id, album_id, album, round_id, confirmed_at').eq('group_id', gid).order('confirmed_at', { ascending: false }),
       ])
       const round = (rounds.data?.[0] as Round | undefined) ?? null
       const [choices, votes] = round
@@ -49,6 +52,7 @@ export function useGroup(gid: string) {
           members: list,
           me: list.find((m) => m.user_id === userId) ?? null,
           round,
+          rounds: (roundList.data ?? []) as RoundMeta[],
           choices: (choices?.data ?? []) as RoundChoice[],
           votes: (votes?.data ?? []) as Vote[],
           history: (history.data ?? []) as HistoryItem[],

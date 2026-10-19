@@ -1,11 +1,12 @@
 import { motion } from 'motion/react'
-import { ExternalLink, Music2 } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { albumDetails, spotifySearch, ytmusicSearch } from '@/lib/musicbrainz'
 import type { Album, AlbumDetails } from '@/lib/types'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
 import { Skeleton } from './ui/skeleton'
+import { SpotifyIcon, YtMusicIcon } from './Brand'
 import { Cover } from './Cover'
 
 const mmss = (ms: number | null) => (ms ? `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}` : '–')
@@ -47,10 +48,10 @@ export function AlbumCard({ album }: { album: Album }) {
           )}
           <div className="flex flex-wrap gap-2">
             <Button size="lg" nativeButton={false} render={<a href={d?.links.spotify ?? spotifySearch(album)} target="_blank" rel="noreferrer" />}>
-              <Music2 /> Ouvir no Spotify <ExternalLink className="opacity-70" />
+              <SpotifyIcon /> Ouvir no Spotify <ExternalLink className="opacity-70" />
             </Button>
             <Button size="lg" variant="outline" nativeButton={false} render={<a href={d?.links.ytmusic ?? ytmusicSearch(album)} target="_blank" rel="noreferrer" />}>
-              <Music2 /> YouTube Music <ExternalLink className="opacity-70" />
+              <YtMusicIcon /> YouTube Music <ExternalLink className="opacity-70" />
             </Button>
           </div>
           {d ? (
