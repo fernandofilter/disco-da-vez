@@ -53,6 +53,7 @@ export function Roulette({ winner, pool, seed, spinKey, skip, onDone }: Props) {
     if (skip || reduceMotion()) {
       x.set(target)
       setDone(true)
+      if (!skip) onDoneRef.current?.() // movimento reduzido: sem animação, mas o resultado ainda precisa aparecer
       return
     }
     x.set(0)

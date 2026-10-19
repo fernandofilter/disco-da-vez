@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { CircleCheck, Link2, Loader2, RotateCcw, Shuffle, Undo2, Vote } from 'lucide-react'
+import { CircleCheck, Disc3, KeyRound, Link2, Loader2, Mic, RotateCcw, Shuffle, Tags, Undo2, Vote } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import type { GroupState } from '@/hooks/useGroup'
@@ -10,6 +10,7 @@ import { sfx } from '@/lib/sound'
 import type { Album, Kind, Mode, Round } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { AlbumCard } from './AlbumCard'
+import { LastfmIcon } from './Brand'
 import { ChoicePicker } from './ChoicePicker'
 import { Agora, Chip, Masthead, Segmented, SoundToggle } from './Guide'
 import type { MarkState } from './Guide'
@@ -26,6 +27,7 @@ const fail = (e: Error) => {
   toast.error(e.message)
 }
 const SKIP_AFTER_MS = 10_000
+const LOCK_HOLD_MS = 1600 // quanto a fita fica parada no vencedor antes de sair de cena
 
 function Section({ title, children, hint }: { title: string; children: React.ReactNode; hint?: string }) {
   return (
@@ -39,16 +41,25 @@ function Section({ title, children, hint }: { title: string; children: React.Rea
   )
 }
 
-/** Fita + cartão do álbum. Quem chega depois do fim da animação vê o resultado direto. */
+/** A fita gira e trava no álbum; um instante depois ela some e fica só o resultado. Quem chega depois do fim da animação vê o resultado direto. */
 function Reveal({ round, album, pool, children }: { round: Round; album: Album; pool: Album[]; children: (rolled: boolean) => React.ReactNode }) {
   const [first] = useState(round.spin)
   const [initialAge] = useState(() => (round.result_at ? Date.now() - new Date(round.result_at).getTime() : 0))
   const skip = round.spin === first && initialAge > SKIP_AFTER_MS
-  const [rolled, setRolled] = useState(skip)
-  useEffect(() => setRolled(skip), [round.spin, skip])
+  const [landed, setLanded] = useState(skip) // a fita parou
+  const [rolled, setRolled] = useState(skip) // a fita saiu de cena
+  useEffect(() => {
+    setLanded(skip)
+    setRolled(skip)
+  }, [round.spin, skip])
+  useEffect(() => {
+    if (!landed) return
+    const t = setTimeout(() => setRolled(true), LOCK_HOLD_MS)
+    return () => clearTimeout(t)
+  }, [landed])
   return (
     <div className="space-y-5">
-      <Roulette winner={album} pool={pool} seed={round.id} spinKey={round.spin} skip={skip} onDone={() => setRolled(true)} />
+      {!rolled && <Roulette winner={album} pool={pool} seed={round.id} spinKey={round.spin} skip={skip} onDone={() => setLanded(true)} />}
       {rolled && <AlbumCard album={album} />}
       {children(rolled)}
     </div>
@@ -150,7 +161,6 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   if (!me) return null
   const lobbyRound = round?.status === 'done' ? round : null
   const winner = lobbyRound?.result?.album
-  const tied = lobbyRound?.result?.tied ?? []
 
   return (
     <main className="mx-auto max-w-6xl px-4 pb-14 pt-4 sm:pt-6">
@@ -158,7 +168,7 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
         <SoundToggle />
       </Masthead>
 
-      <header className="space-y-5 py-6 sm:py-8">
+      <header className="space-y-3 py-5 sm:py-6">
         <h1 className="break-words text-[clamp(3.5rem,16vw,6rem)]">{group.name}</h1>
         <Agora text={next}>
           {active && (
@@ -185,15 +195,21 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
                   >
                     <Link2 /> Copiar convite
                   </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => navigator.clipboard.writeText(group.id).then(() => toast.success('Código do grupo copiado'), () => toast.error('Não consegui copiar'))}
+                  >
+                    <KeyRound /> Copiar código
+                  </Button>
                   {leaderStale && (
                     <Button variant="secondary" onClick={() => api.claimLeadership(group.id).then(refresh, fail)}>O líder sumiu há 7+ dias: assumir liderança</Button>
                   )}
                   <details className="text-sm">
-                    <summary className="flex min-h-11 cursor-pointer items-center font-semibold underline underline-offset-4">Meu perfil{lastfmEnabled ? ' · Last.fm' : ''}</summary>
+                    <summary className="flex min-h-11 cursor-pointer items-center gap-2 font-semibold underline underline-offset-4"><LastfmIcon className="size-4" />Meu perfil{lastfmEnabled ? ' · Last.fm' : ''}</summary>
                     {lastfmEnabled ? (
                       <form onSubmit={saveProfile} className="mt-1 flex gap-2">
                         <Input value={lastfm} onChange={(e) => setLastfm(e.target.value)} placeholder="Usuário do Last.fm (evita álbuns que você já ouviu)" aria-label="Usuário do Last.fm" maxLength={40} />
-                        <Button type="submit" variant="outline">Salvar</Button>
+                        <Button type="submit" variant="outline"><LastfmIcon /> Salvar</Button>
                       </form>
                     ) : (
                       <p className="mt-1 text-muted-foreground">O filtro de álbuns já escutados precisa de uma chave da API do Last.fm (VITE_LASTFM_KEY).</p>
@@ -212,27 +228,23 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
               {lobbyRound && winner && (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">Última rodada ({lobbyRound.kind === 'vote' ? 'votação' : 'sorteio'}):</p>
-                  {lobbyRound.kind === 'vote' && tied.length > 1 ? (
-                    <Reveal round={lobbyRound} album={winner} pool={tied.concat(lobbyRound.candidates ?? [])}>{() => null}</Reveal>
-                  ) : (
-                    <AlbumCard album={winner} />
-                  )}
+                  <AlbumCard album={winner} />
                 </div>
               )}
               {isLeader && (
                 <Card className="gap-5 p-4 sm:p-5">
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 xl:grid-cols-2">
                     <div className="space-y-2">
                       <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Escolher por</p>
-                      <Segmented label="Escolher por" value={mode} onChange={setMode} options={[{ v: 'artist', label: 'Bandas/artistas' }, { v: 'genre', label: 'Gêneros' }]} />
+                      <Segmented label="Escolher por" value={mode} onChange={setMode} options={[{ v: 'artist', label: 'Bandas/artistas', icon: <Mic className="size-4" /> }, { v: 'genre', label: 'Gêneros', icon: <Tags className="size-4" /> }]} />
                     </div>
                     <div className="space-y-2">
                       <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Decidir por</p>
-                      <Segmented label="Decidir por" value={kind} onChange={setKind} options={[{ v: 'draw', label: 'Sorteio' }, { v: 'vote', label: 'Votação' }]} />
+                      <Segmented label="Decidir por" value={kind} onChange={setKind} options={[{ v: 'draw', label: 'Sorteio', icon: <Shuffle className="size-4" /> }, { v: 'vote', label: 'Votação', icon: <Vote className="size-4" /> }]} />
                     </div>
                   </div>
                   <Button size="lg" disabled={members.length < 2} onClick={() => api.startRound(group.id, mode, kind).then(refresh, fail)}>
-                    {members.length < 2 ? 'Convide pelo menos mais 1 pessoa' : 'Iniciar rodada'}
+                    <Disc3 /> {members.length < 2 ? 'Convide pelo menos mais 1 pessoa' : 'Iniciar rodada'}
                   </Button>
                 </Card>
               )}
@@ -281,7 +293,7 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
             <Section title="Votação" hint="Seu voto é secreto até todos votarem. Dá para trocar antes de encerrar.">
               <VotePanel roundId={active.id} candidates={active.candidates} myVote={votes.find((v) => v.member_id === me.id)?.album_id} />
               {isLeader && !allVoted && (
-                <Button variant="outline" onClick={() => api.closeVote(active.id).catch(fail)}>Encerrar votação agora</Button>
+                <Button variant="outline" onClick={() => api.closeVote(active.id).catch(fail)}><CircleCheck /> Encerrar votação agora</Button>
               )}
             </Section>
           )}

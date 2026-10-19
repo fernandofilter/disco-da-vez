@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { Volume2, VolumeX } from 'lucide-react'
 import { useMuted } from '@/lib/sound'
 import { cn } from '@/lib/utils'
@@ -34,12 +35,14 @@ export function Chip({ mine, initial, state }: { mine: boolean; initial: string;
 /** O próximo passo de quem está olhando, em uma linha só. */
 export function Agora({ text, children }: { text: string; children?: React.ReactNode }) {
   return (
-    <div className="space-y-3">
-      <p aria-live="polite" className="flex items-start gap-3 text-4xl font-extrabold uppercase leading-[0.92] sm:text-6xl" style={{ fontStretch: '62%' }}>
+    <div className="space-y-2.5">
+      <p aria-live="polite" className="flex items-start gap-2.5 text-2xl font-extrabold uppercase leading-[0.95] sm:text-4xl" style={{ fontStretch: '62%' }}>
         <span aria-hidden className="live-dot mt-[0.12em] text-live" />
         <span>
           <span className="text-muted-foreground">Agora: </span>
-          {text}
+          <motion.span key={text} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}>
+            {text}
+          </motion.span>
         </span>
       </p>
       {children}
@@ -48,7 +51,7 @@ export function Agora({ text, children }: { text: string; children?: React.React
 }
 
 /** Dois botões lado a lado; o escolhido fica em tinta cheia e com quadrado cheio, o outro em contorno. */
-export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; label: string }[]; label: string }) {
+export function Segmented<T extends string>({ value, onChange, options, label }: { value: T; onChange: (v: T) => void; options: { v: T; label: string; icon?: React.ReactNode }[]; label: string }) {
   return (
     <div role="group" aria-label={label} className="grid grid-cols-2 gap-2">
       {options.map((o) => {
@@ -65,6 +68,7 @@ export function Segmented<T extends string>({ value, onChange, options, label }:
             )}
           >
             <span aria-hidden className={cn('size-3 shrink-0 border-2 border-current', on && 'bg-current')} />
+            {o.icon && <span aria-hidden className="hidden shrink-0 sm:block">{o.icon}</span>}
             {o.label}
           </button>
         )

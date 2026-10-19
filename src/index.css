@@ -39,7 +39,7 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* Grade de programação: papel frio de jornal, tinta quase preta, filetes, e uma cor só: o azul de "você". Um tema só (claro). */
+/* Grade de programação: papel frio de jornal, tinta quase preta, filetes, e uma cor só: o vermelho de "você". Um tema só (claro). */
 :root {
     --background: oklch(0.965 0.007 250);
     --foreground: oklch(0.17 0.012 262);
@@ -58,12 +58,12 @@
     --destructive: oklch(0.5 0.21 27);
     --border: oklch(0.17 0.012 262 / 0.2);
     --input: oklch(0.17 0.012 262);
-    --ring: oklch(0.5 0.21 262);
+    --ring: oklch(0.5 0.21 27);
     --radius: 0.25rem;
     --live: oklch(0.58 0.22 27);
 
     /* a única cor de pessoa: "você" (a sua linha, o seu chip, a sua vaga) */
-    --you: oklch(0.5 0.21 262);
+    --you: oklch(0.5 0.21 27);
     --you-ink: oklch(0.99 0 0);
 
     --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .25 0 0 0 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -93,6 +93,13 @@
     line-height: 0.9;
     letter-spacing: -0.005em;
     text-wrap: balance;
+  }
+  /* o preflight do Tailwind 4 deixa botões com a seta: tudo que se clica vira mãozinha */
+  button:not(:disabled), [role='button']:not([aria-disabled='true']), summary, select {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
   }
   ::selection {
     background: var(--foreground);
@@ -187,13 +194,16 @@
     border-radius: 9999px;
     background: var(--live);
   }
+  /* pulso de rádio: um disco que cresce e some (sem borda, que engrossava ao escalar), com uma pausa antes do próximo */
   .live-dot::after {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    border: 2px solid var(--live);
-    animation: tally 2s ease-out infinite;
+    background: var(--live);
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: tally 2.4s cubic-bezier(0.2, 0.6, 0.35, 1) infinite;
   }
 }
 
@@ -206,8 +216,8 @@
   to { transform: scaleX(1); }
 }
 @keyframes tally {
-  from { transform: scale(1); opacity: 0.7; }
-  to { transform: scale(2.2); opacity: 0; }
+  0% { transform: scale(1); opacity: 0.55; }
+  75%, 100% { transform: scale(2.6); opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

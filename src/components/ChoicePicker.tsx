@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { Check, Loader2, Pencil, X } from 'lucide-react'
+import { Check, Loader2, Mic, Pencil, Tags, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import genres from '@/data/genres.json'
@@ -83,6 +83,7 @@ export function ChoicePicker({ roundId, mode, initial, ready }: Props) {
           {items.map((c) => (
             <motion.div key={c.id} layout initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
               <span className="flex h-11 items-center gap-1 rounded-sm border-[1.5px] border-foreground bg-foreground pl-3 text-base font-bold text-background">
+                {mode === 'artist' ? <Mic className="mr-1 size-4 shrink-0" aria-hidden /> : <Tags className="mr-1 size-4 shrink-0" aria-hidden />}
                 {c.name}
                 {!locked && (
                   <button aria-label={`Remover ${c.name}`} className="flex size-11 items-center justify-center hover:bg-background/15" onClick={() => save(items.filter((i) => i.id !== c.id), false)}>
