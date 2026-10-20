@@ -22,7 +22,7 @@ interface Store {
 }
 const load = (): Store => {
   try {
-    return { mode: 'artist', choices: {}, history: [], ...JSON.parse(localStorage.getItem(KEY) ?? '{}') }
+    return { mode: 'artist', history: [], ...JSON.parse(localStorage.getItem(KEY) ?? '{}'), choices: {} } // escolhas começam zeradas a cada dinâmica; só o histórico fica
   } catch {
     return { mode: 'artist', choices: {}, history: [] }
   }
@@ -46,6 +46,7 @@ export default function Solo() {
   const [asking, setAsking] = useState<string | null>(null)
   const { mode, history } = store
   const items = store.choices[mode] ?? []
+  const min = mode === 'album' ? 2 : 1 // sortear entre álbuns pede pelo menos 2
 
   const update = (next: Store) => {
     setStore(next)
@@ -106,9 +107,9 @@ export default function Solo() {
                 onChange={(m) => update({ ...store, mode: m })}
                 options={[{ v: 'artist', label: 'Bandas/artistas', icon: <Mic className="size-4" /> }, { v: 'genre', label: 'Gêneros', icon: <Tags className="size-4" /> }, { v: 'album', label: 'Álbuns', icon: <AlbumIcon className="size-4" /> }]}
               />
-              <ChoicePicker roundId={mode} mode={mode} initial={items} ready={items.length > 0} onChange={(next) => update({ ...store, choices: { ...store.choices, [mode]: next } })} />
+              <ChoicePicker roundId={mode} mode={mode} initial={items} ready={items.length >= min} min={min} onChange={(next) => update({ ...store, choices: { ...store.choices, [mode]: next } })} />
             </Card>
-            <Button size="lg" disabled={items.length === 0 || busy} onClick={draw}>
+            <Button size="lg" disabled={items.length < min || busy} onClick={draw}>
               <Shuffle /> Sortear álbum
             </Button>
           </section>

@@ -8,6 +8,7 @@ import { artistAlbums, hasCover, searchAlbums, searchArtists } from '@/lib/music
 import { sfx } from '@/lib/sound'
 import type { Choice, Mode } from '@/lib/types'
 import { AlbumIcon } from './Brand'
+import { Cover } from './Cover'
 import { Button } from './ui/button'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command'
 
@@ -24,12 +25,14 @@ interface Props {
   mode: Mode
   initial: Choice[]
   ready: boolean
+  /** Mínimo de escolhas para confirmar (padrão 1). */
+  min?: number
   /** Sem isso salva no servidor (rodada do grupo); o modo solo guarda no próprio aparelho. */
   onChange?: (items: Choice[], ready: boolean) => void
 }
 
 /** Até 5 artistas (busca no MusicBrainz) ou gêneros (lista oficial do MusicBrainz). Salva a cada mudança. */
-export function ChoicePicker({ roundId, mode, initial, ready, onChange }: Props) {
+export function ChoicePicker({ roundId, mode, initial, ready, min = 1, onChange }: Props) {
   const [items, setItems] = useState<Choice[]>(initial)
   const [query, setQuery] = useState('')
   const [found, setFound] = useState<Choice[]>([])
@@ -112,7 +115,7 @@ export function ChoicePicker({ roundId, mode, initial, ready, onChange }: Props)
             </motion.div>
           ))}
         </AnimatePresence>
-        {items.length === 0 && <p className="self-center text-sm text-muted-foreground">Escolha de 1 a {MAX} {copy.many}.</p>}
+        {items.length === 0 && <p className="self-center text-sm text-muted-foreground">Escolha de {min} a {MAX} {copy.many}.</p>}
       </div>
 
       {locked ? (
@@ -132,6 +135,7 @@ export function ChoicePicker({ roundId, mode, initial, ready, onChange }: Props)
                 )}
                 {options.map((o) => (
                   <CommandItem key={o.id} value={o.id} onSelect={() => add(o)}>
+                    {mode === 'album' && <Cover album={{ id: o.id, title: o.name }} size={250} className="size-12 shrink-0" />}
                     <span className="max-w-[60%] shrink-0 truncate">{o.name}</span>
                     {o.sub && <span className="ml-2 min-w-0 truncate text-xs opacity-70">{o.sub}{o.year ? ` · ${o.year}` : ''}</span>}
                   </CommandItem>
@@ -139,7 +143,7 @@ export function ChoicePicker({ roundId, mode, initial, ready, onChange }: Props)
               </CommandList>
             )}
           </Command>
-          <Button size="lg" disabled={items.length === 0} onClick={() => { setLocked(true); save(items, true); sfx.ready() }}>
+          <Button size="lg" disabled={items.length < min} onClick={() => { setLocked(true); save(items, true); sfx.ready() }}>
             <Check /> Confirmar escolhas ({items.length}/{MAX})
           </Button>
         </>

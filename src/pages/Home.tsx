@@ -17,7 +17,7 @@ const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 // three.js só carrega na tela inicial, depois do primeiro desenho
 const Vinyl = lazy(() => import('@/components/Vinyl'))
 
-type View = 'start' | 'create' | 'join'
+type View = 'start' | 'friends' | 'create' | 'join'
 const EASE = [0.22, 1, 0.36, 1] as const
 const rise = (delay: number) => ({ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } })
 
@@ -60,8 +60,8 @@ export default function Home() {
     }
   }
 
-  const back = (
-    <Button type="button" variant="ghost" size="sm" className="-ml-3 self-start" onClick={() => setView('start')}>
+  const back = (to: View) => (
+    <Button type="button" variant="ghost" size="sm" className="-ml-3 self-start" onClick={() => setView(to)}>
       <ArrowLeft /> Voltar
     </Button>
   )
@@ -81,7 +81,8 @@ export default function Home() {
         </div>
         <motion.div {...rise(0.2)} aria-hidden className="relative aspect-[5/4] w-full">
           {/* disco vermelho impresso em meio-tom: a cor da página, atrás do vinil */}
-          <div className="halftone absolute right-[4%] top-1/2 aspect-square h-[92%] -translate-y-1/2 rounded-full bg-you after:rounded-full" />
+          {/* no celular o disco fica no centro, onde o vinil e a capa se equilibram; de md em diante vai para a direita */}
+          <div className="halftone absolute left-1/2 top-1/2 aspect-square h-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-you after:rounded-full md:left-auto md:right-[4%] md:translate-x-0" />
           <Suspense fallback={null}>
             <Vinyl />
           </Suspense>
@@ -92,24 +93,32 @@ export default function Home() {
         {view === 'start' ? (
           <motion.div key="start" exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }} className="mt-10 space-y-10">
             <motion.div {...rise(0.3)} className="flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className={START_BTN} onClick={() => setView('create')}>
-                <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
+              <Button size="lg" className={START_BTN} onClick={() => setView('friends')}>
+                <Users className="transition-transform duration-300 ease-out group-hover/button:scale-110" /> Jogar com amigos
               </Button>
               <Button size="lg" variant="outline" className={START_BTN} onClick={() => nav('/solo')}>
                 <User className="transition-transform duration-300 ease-out group-hover/button:scale-110" /> Jogar sozinho
-              </Button>
-              <Button size="lg" variant="outline" className={START_BTN} onClick={() => setView('join')}>
-                <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
               </Button>
             </motion.div>
             <Steps />
           </motion.div>
         ) : (
           <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className="mt-10 max-w-xl">
-            {view === 'create' ? (
+            {view === 'friends' ? (
+              <Card className="gap-3 rounded-none border-t-[6px] p-5">
+                {back('start')}
+                <h2 className="text-3xl">Jogar com amigos</h2>
+                <Button size="lg" className="w-full hover:border-you hover:bg-you hover:text-you-ink" onClick={() => setView('create')}>
+                  <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
+                </Button>
+                <Button size="lg" variant="outline" className="w-full hover:border-you hover:bg-you hover:text-you-ink" onClick={() => setView('join')}>
+                  <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
+                </Button>
+              </Card>
+            ) : view === 'create' ? (
               <form onSubmit={create}>
                 <Card className="gap-3 rounded-none border-t-[6px] p-5">
-                  {back}
+                  {back('friends')}
                   <h2 className="text-3xl">Criar grupo</h2>
                   <Input aria-label="Nome do grupo" placeholder="Nome do grupo" value={group} onChange={(e) => setGroup(e.target.value)} maxLength={40} required autoFocus />
                   <Input aria-label="Seu nome" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required />
@@ -121,7 +130,7 @@ export default function Home() {
             ) : (
               <form onSubmit={join}>
                 <Card className="gap-3 rounded-none border-t-[6px] p-5">
-                  {back}
+                  {back('friends')}
                   <h2 className="text-3xl">Entrar em um grupo</h2>
                   <p className="text-sm text-muted-foreground">Cole o código que o grupo gerou (a pessoa que criou encontra em “Copiar código”). O link do convite também vale.</p>
                   <Input aria-label="Código do grupo" placeholder="Código do grupo" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoCapitalize="none" spellCheck={false} required autoFocus />

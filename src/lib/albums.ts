@@ -51,8 +51,24 @@ export async function drawAlbums(opts: {
 }): Promise<{ albums: Album[]; filler: Album[] }> {
   const byChoice = new Map<string, Album[]>()
   const pool = poolFor(opts.mode)
-  const remember = (c: Choice, list: Candidate[]) => byChoice.set(c.id, list.flatMap((x) => x.album ?? []))
+  // itens do Last.fm não trazem álbum pronto: lista vazia não conta, para a fita ainda buscar essa escolha no MusicBrainz
+  const remember = (c: Choice, list: Candidate[]) => {
+    const albums = list.flatMap((x) => x.album ?? [])
+    if (albums.length) byChoice.set(c.id, albums)
+  }
   const withChoices = opts.members.map((m) => ({ id: m.id, choices: opts.choices[m.id] ?? [] })).filter((m) => m.choices.length)
+
+  // a fita mostra capas de todo mundo, não só do pool que o sorteio abriu: já busca as outras escolhas enquanto sorteia
+  const turns = withChoices.map((m) => shuffle(m.choices))
+  const rest = Array.from({ length: Math.max(0, ...turns.map((t) => t.length)) }, (_, i) => turns.flatMap((t) => t[i] ?? [])).flat()
+  let over = false
+  const gather = async () => {
+    for (const c of rest) {
+      if (over || byChoice.size >= FILLER_CHOICES) return
+      if (!byChoice.has(c.id)) await (opts.mode === 'genre' ? genreAlbums(c.name).then((l) => l.map(own)) : pool(c)).then((l) => remember(c, l), () => {})
+    }
+  }
+  const gathering = gather()
   const { albums } = await pickAlbums(
     {
       members: withChoices,
@@ -68,17 +84,7 @@ export async function drawAlbums(opts: {
     opts.count,
   )
 
-  // a fita mostra capas de todo mundo, não só do pool que o sorteio abriu primeiro: completa com uma amostra das outras escolhas
-  const turns = withChoices.map((m) => shuffle(m.choices))
-  const rest = Array.from({ length: Math.max(0, ...turns.map((t) => t.length)) }, (_, i) => turns.flatMap((t) => t[i] ?? [])).flat()
-  let over = false
-  const gather = async () => {
-    for (const c of rest) {
-      if (over || byChoice.size >= FILLER_CHOICES) return
-      if (!byChoice.has(c.id)) await pool(c).then((l) => remember(c, l), () => {})
-    }
-  }
-  await Promise.race([gather(), new Promise((r) => setTimeout(r, FILLER_BUDGET_MS))])
+  await Promise.race([gathering, new Promise((r) => setTimeout(r, FILLER_BUDGET_MS))])
   over = true // o que ainda estiver na fila do MusicBrainz não atrasa mais nada
   const picked = new Set(albums.map((a) => a.id))
   const sample = shuffle([...byChoice.values()].flatMap((l) => shuffle(l.filter((a) => !picked.has(a.id))).slice(0, FILLER_PER_CHOICE)))
