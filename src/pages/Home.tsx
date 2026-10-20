@@ -1,33 +1,15 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Disc3, Headphones, KeyRound, Mic, Shuffle, Users } from 'lucide-react'
+import { ArrowLeft, Disc3, Headphones, KeyRound, Mic, Shuffle, User, Users } from 'lucide-react'
 import { lazy, Suspense, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { LastfmIcon } from '@/components/Brand'
-import { BRAND, Masthead, SoundToggle } from '@/components/Guide'
+import { BRAND, Masthead, SoundToggle, Footer } from '@/components/Guide'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { lastfmEnabled, lastfmUserExists } from '@/lib/lastfm'
+import { rememberGroup } from '@/lib/groups'
 import { sfx } from '@/lib/sound'
-import { cn } from '@/lib/utils'
-
-const KEY = 'album-sort:groups'
-export const savedGroups = (): { id: string; name: string }[] => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]')
-  } catch {
-    return []
-  }
-}
-export const rememberGroup = (id: string, name: string) => {
-  try {
-    localStorage.setItem(KEY, JSON.stringify([{ id, name }, ...savedGroups().filter((g) => g.id !== id)].slice(0, 12)))
-  } catch {
-    /* storage bloqueado: só perde a lista de atalhos */
-  }
-}
 
 // o código do grupo é o id dele (o mesmo do link de convite): aceita o código puro ou o link colado
 const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
@@ -35,7 +17,7 @@ const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
 // three.js só carrega na tela inicial, depois do primeiro desenho
 const Vinyl = lazy(() => import('@/components/Vinyl'))
 
-type View = 'start' | 'create' | 'join'
+type View = 'start' | 'friends' | 'create' | 'join'
 const EASE = [0.22, 1, 0.36, 1] as const
 const rise = (delay: number) => ({ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay, ease: EASE } })
 
@@ -47,17 +29,14 @@ export default function Home() {
   const [view, setView] = useState<View>('start')
   const [group, setGroup] = useState('')
   const [name, setName] = useState('')
-  const [lastfm, setLastfm] = useState('')
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
-  const mine = savedGroups()
 
   async function create(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true)
     try {
-      if (lastfm.trim() && !(await lastfmUserExists(lastfm.trim()))) throw new Error('Usuário do Last.fm não encontrado.')
-      const id = await api.createGroup(group, name, lastfm)
+      const id = await api.createGroup(group, name)
       rememberGroup(id, group.trim())
       nav(`/g/${id}`)
     } catch (err) {
@@ -81,8 +60,8 @@ export default function Home() {
     }
   }
 
-  const back = (
-    <Button type="button" variant="ghost" size="sm" className="-ml-3 self-start" onClick={() => setView('start')}>
+  const back = (to: View) => (
+    <Button type="button" variant="ghost" size="sm" className="-ml-3 self-start" onClick={() => setView(to)}>
       <ArrowLeft /> Voltar
     </Button>
   )
@@ -102,7 +81,8 @@ export default function Home() {
         </div>
         <motion.div {...rise(0.2)} aria-hidden className="relative aspect-[5/4] w-full">
           {/* disco vermelho impresso em meio-tom: a cor da página, atrás do vinil */}
-          <div className="halftone absolute right-[4%] top-1/2 aspect-square h-[92%] -translate-y-1/2 rounded-full bg-you after:rounded-full" />
+          {/* no celular o disco fica no centro, onde o vinil e a capa se equilibram; de md em diante vai para a direita */}
+          <div className="halftone absolute left-1/2 top-1/2 aspect-square h-[92%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-you after:rounded-full md:left-auto md:right-[4%] md:translate-x-0" />
           <Suspense fallback={null}>
             <Vinyl />
           </Suspense>
@@ -113,33 +93,35 @@ export default function Home() {
         {view === 'start' ? (
           <motion.div key="start" exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }} className="mt-10 space-y-10">
             <motion.div {...rise(0.3)} className="flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" className={START_BTN} onClick={() => setView('create')}>
-                <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
+              <Button size="lg" className={START_BTN} onClick={() => setView('friends')}>
+                <Users className="transition-transform duration-300 ease-out group-hover/button:scale-110" /> Jogar com amigos
               </Button>
-              <Button size="lg" variant="outline" className={START_BTN} onClick={() => setView('join')}>
-                <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
+              <Button size="lg" variant="outline" className={START_BTN} onClick={() => nav('/solo')}>
+                <User className="transition-transform duration-300 ease-out group-hover/button:scale-110" /> Jogar sozinho
               </Button>
             </motion.div>
-            <div className={cn('grid gap-10', mine.length > 0 && 'md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-12')}>
-              <Steps />
-              {mine.length > 0 && <SavedGroups items={mine} />}
-            </div>
+            <Steps />
           </motion.div>
         ) : (
-          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className={cn('mt-10 grid gap-10', mine.length > 0 && 'md:grid-cols-2 md:gap-12')}>
-            {view === 'create' ? (
+          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className="mt-10 max-w-xl">
+            {view === 'friends' ? (
+              <Card className="gap-3 rounded-none border-t-[6px] p-5">
+                {back('start')}
+                <h2 className="text-3xl">Jogar com amigos</h2>
+                <Button size="lg" className="w-full hover:border-you hover:bg-you hover:text-you-ink" onClick={() => setView('create')}>
+                  <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
+                </Button>
+                <Button size="lg" variant="outline" className="w-full hover:border-you hover:bg-you hover:text-you-ink" onClick={() => setView('join')}>
+                  <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
+                </Button>
+              </Card>
+            ) : view === 'create' ? (
               <form onSubmit={create}>
                 <Card className="gap-3 rounded-none border-t-[6px] p-5">
-                  {back}
+                  {back('friends')}
                   <h2 className="text-3xl">Criar grupo</h2>
                   <Input aria-label="Nome do grupo" placeholder="Nome do grupo" value={group} onChange={(e) => setGroup(e.target.value)} maxLength={40} required autoFocus />
                   <Input aria-label="Seu nome" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required />
-                  {lastfmEnabled && (
-                    <div className="relative">
-                      <LastfmIcon className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2" />
-                      <Input className="pl-11" aria-label="Usuário do Last.fm" placeholder="Usuário do Last.fm (opcional)" value={lastfm} onChange={(e) => setLastfm(e.target.value)} maxLength={40} />
-                    </div>
-                  )}
                   <Button type="submit" size="lg" disabled={busy || !group.trim() || !name.trim()}>
                     <Disc3 className={busy ? 'animate-spin' : ''} /> {busy ? 'Criando…' : 'Criar e convidar amigos'}
                   </Button>
@@ -148,7 +130,7 @@ export default function Home() {
             ) : (
               <form onSubmit={join}>
                 <Card className="gap-3 rounded-none border-t-[6px] p-5">
-                  {back}
+                  {back('friends')}
                   <h2 className="text-3xl">Entrar em um grupo</h2>
                   <p className="text-sm text-muted-foreground">Cole o código que o grupo gerou (a pessoa que criou encontra em “Copiar código”). O link do convite também vale.</p>
                   <Input aria-label="Código do grupo" placeholder="Código do grupo" value={code} onChange={(e) => setCode(e.target.value)} autoComplete="off" autoCapitalize="none" spellCheck={false} required autoFocus />
@@ -158,10 +140,10 @@ export default function Home() {
                 </Card>
               </form>
             )}
-            {mine.length > 0 && <SavedGroups items={mine} />}
           </motion.div>
         )}
       </AnimatePresence>
+      <Footer />
     </main>
   )
 }
@@ -190,24 +172,6 @@ function Steps() {
           </motion.li>
         ))}
       </ol>
-    </section>
-  )
-}
-
-function SavedGroups({ items }: { items: { id: string; name: string }[] }) {
-  return (
-    <section aria-label="Seus grupos" className="space-y-3 border-t-[3px] border-foreground pt-3">
-      <h2 className="text-3xl">Seus grupos</h2>
-      <ul className="box divide-y divide-foreground/20 overflow-hidden">
-        {items.map((g, i) => (
-          <motion.li key={g.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, delay: 0.1 + i * 0.05, ease: EASE }}>
-            <Link to={`/g/${g.id}`} className="group/row flex min-h-14 items-center justify-between gap-3 bg-card px-4 py-2 text-lg font-bold transition-colors hover:bg-muted">
-              <span className="truncate">{g.name}</span>
-              <ArrowRight className="size-5 shrink-0 transition-transform duration-200 group-hover/row:translate-x-1" />
-            </Link>
-          </motion.li>
-        ))}
-      </ul>
     </section>
   )
 }

@@ -1,32 +1,34 @@
 import { motion } from 'motion/react'
-import { Album as AlbumIcon, CircleCheck, Dices, Disc3, History, KeyRound, Link2, Loader2, Mic, RotateCcw, Shuffle, Tags, Undo2, Vote } from 'lucide-react'
+import { CircleCheck, Dices, Disc3, History, KeyRound, Link2, Loader2, Mic, RotateCcw, Shuffle, Tags, Trash2, Undo2, Vote } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import type { GroupState } from '@/hooks/useGroup'
 import { api } from '@/lib/api'
 import { drawAlbums } from '@/lib/albums'
-import { lastfmEnabled, lastfmUserExists } from '@/lib/lastfm'
 import { sfx } from '@/lib/sound'
 import type { Album, Kind, Mode, Round } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { AlbumCard } from './AlbumCard'
-import { LastfmIcon } from './Brand'
+import { AlbumIcon } from './Brand'
 import { ChoicePicker } from './ChoicePicker'
-import { Agora, Chip, Masthead, Segmented, SoundToggle, Stages } from './Guide'
+import { Agora, Chip, Masthead, Segmented, SoundToggle, Stages, Footer } from './Guide'
 import type { MarkState } from './Guide'
+import { forgetGroup } from '@/lib/groups'
 import { MemberList } from './MemberList'
+import { albumDetails, albumSides, artistAlbums } from '@/lib/musicbrainz'
+import { previews } from '@/lib/preview'
+import { Garimpo } from './Garimpo'
 import { Roulette } from './Roulette'
 import { VotePanel } from './VotePanel'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
-import { Input } from './ui/input'
 
 const fail = (e: Error) => {
   sfx.error()
   toast.error(e.message)
 }
-const SKIP_AFTER_MS = 10_000
+const SKIP_AFTER_MS = 14_000 // a fita dura 11 s e segura o vencedor por mais um pouco
 const LOCK_HOLD_MS = 1600 // quanto a fita fica parada no vencedor antes de sair de cena
 
 function Section({ title, children, hint }: { title: string; children: React.ReactNode; hint?: string }) {
@@ -42,7 +44,7 @@ function Section({ title, children, hint }: { title: string; children: React.Rea
 }
 
 /** A fita gira e trava no álbum; um instante depois ela some e fica só o resultado. Quem chega depois do fim da animação vê o resultado direto. */
-function Reveal({ round, album, pool, children }: { round: Round; album: Album; pool: Album[]; children: (rolled: boolean) => React.ReactNode }) {
+export function Reveal({ round, album, pool, hint, children }: { round: Pick<Round, 'id' | 'spin' | 'result_at'>; album?: Album; pool: Album[]; hint?: string; children: (rolled: boolean) => React.ReactNode }) {
   const [first] = useState(round.spin)
   const [initialAge] = useState(() => (round.result_at ? Date.now() - new Date(round.result_at).getTime() : 0))
   const skip = round.spin === first && initialAge > SKIP_AFTER_MS
@@ -52,16 +54,29 @@ function Reveal({ round, album, pool, children }: { round: Round; album: Album; 
     setLanded(skip)
     setRolled(skip)
   }, [round.spin, skip])
+  // enquanto a fita gira já busca faixas e prévias: o card aparece pronto quando ela parar
+  const albumId = album?.id
+  useEffect(() => {
+    if (!album) return
+    albumDetails(album.id).catch(() => {})
+    albumSides(album.id).catch(() => {})
+    previews(album).catch(() => {})
+  }, [albumId]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!landed) return
     const t = setTimeout(() => setRolled(true), LOCK_HOLD_MS)
-    return () => clearTimeout(t)
-  }, [landed])
+    const w = skip ? undefined : setTimeout(sfx.win, 450) // quem chegou depois do fim não ouve a fanfarra
+    return () => {
+      clearTimeout(t)
+      clearTimeout(w)
+    }
+  }, [landed, skip])
   return (
     <div className="space-y-5">
-      {!rolled && <Roulette winner={album} pool={pool} seed={round.id} spinKey={round.spin} skip={skip} onDone={() => setLanded(true)} />}
-      {rolled && <AlbumCard album={album} />}
-      {children(rolled)}
+      {!album && <Garimpo hint={hint} />}
+      {album && !rolled && <Roulette winner={album} pool={pool} seed={round.id} spinKey={round.spin} skip={skip} onDone={() => setLanded(true)} />}
+      {rolled && album && <AlbumCard album={album} />}
+      {children(rolled && !!album)}
     </div>
   )
 }
@@ -71,8 +86,9 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   const isLeader = group.leader_id === userId
   const [mode, setMode] = useState<Mode>(group.last_mode)
   const [kind, setKind] = useState<Kind>(group.last_kind)
-  const [busy, setBusy] = useState<string | null>(null) // texto de progresso do sorteio
-  const [lastfm, setLastfm] = useState(me?.lastfm_user ?? '')
+  const [busy, setBusy] = useState(false) // a busca dos álbuns está rolando (só no celular do líder)
+  const nav = useNavigate()
+  const [sure, setSure] = useState(false) // confirmação de excluir o grupo
   const [rolls, setRolls] = useState(0)
   const closing = useRef(false)
   const seen = useRef(members.length)
@@ -87,13 +103,33 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   const leaderMember = members.find((m) => m.user_id === group.leader_id)
   // gerir o grupo só antes de escolher as bandas; no sorteio a seção some, e nas escolhas/votação vira só leitura
   const manage = !active
-  const showPeople = active?.status !== 'drawing'
+  // cada etapa é uma tela: as pessoas só aparecem antes e durante as escolhas; sorteio e votação ocupam a tela inteira
+  const showPeople = !active || active.status === 'choosing'
   const col2 = showPeople ? 'lg:col-start-2' : 'lg:col-start-1'
   // número da rodada (#1, #2…): a que está rolando, ou a próxima quando nada está rolando
   const total = rounds.length
   const nextNo = total + 1
   const stage = active ? (active.status === 'choosing' ? 1 : 2) : total > 0 ? 3 : 0
   const leaderStale = !isLeader && (!leaderMember || Date.now() - new Date(leaderMember.last_seen).getTime() > 7 * 86_400_000)
+
+  // o líder já aquece as discografias das bandas escolhidas enquanto o grupo escolhe: na hora de sortear elas estão em cache
+  const picks = active?.mode === 'artist' && isLeader ? choices.flatMap((c) => c.items) : []
+  const picksKey = picks.map((c) => c.id).join()
+  useEffect(() => {
+    picks.forEach((c) => artistAlbums(c).catch(() => {}))
+  }, [picksKey]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // trocou de etapa: a nova tela começa no topo
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+  }, [round?.id, round?.status])
+
+  // a votação fechou sem roleta (sem empate): a fanfarra do vencedor
+  const prevStatus = useRef(round?.status)
+  useEffect(() => {
+    if (prevStatus.current === 'voting' && round?.status === 'done' && !((round.result?.tied?.length ?? 0) > 1)) sfx.win()
+    prevStatus.current = round?.status
+  }, [round?.status]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // alguém entrou: um toque de aviso (a lista inicial não conta)
   useEffect(() => {
@@ -127,34 +163,47 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   }
   const progress = active?.status === 'voting' ? votedCount : active?.status === 'drawing' ? participants.length : readyCount
 
+  /** O servidor abre a dinâmica na hora (todos veem a fita/slots girando) e a busca dos álbuns acontece enquanto ela rola. */
   async function run(r: Round) {
-    const count = r.kind === 'vote' ? 6 : 1
-    setBusy(r.kind === 'vote' ? `Garimpando álbuns 0/${count}…` : 'Garimpando um álbum…')
+    const vote = r.kind === 'vote'
+    setBusy(true)
     try {
+      await api.beginDeal(r.id)
+      refresh()
       const { albums, filler } = await drawAlbums({
         mode: r.mode,
         members: participants,
         choices: Object.fromEntries(choices.map((c) => [c.member_id, c.items])),
         historyIds: history.map((h) => h.album_id),
-        count,
-        onProgress: (d, t) => r.kind === 'vote' && setBusy(`Garimpando álbuns ${d}/${t}…`),
+        count: vote ? 6 : 1,
       })
-      if (albums.length < (r.kind === 'vote' ? 2 : 1)) {
+      if (albums.length < (vote ? 2 : 1)) {
         sfx.error()
-        return toast.error('Não achei álbuns suficientes com essas escolhas (histórico, já escutados ou sem capa). Troquem algumas escolhas.')
+        toast.error('Não achei álbuns suficientes com essas escolhas (histórico ou sem capa). Troquem algumas escolhas.')
+        return await api.backToChoosing(r.id)
       }
-      if (r.kind === 'vote') {
+      if (vote) {
         if (albums.length < 6) toast.info(`Só consegui ${albums.length} álbuns para a votação.`)
-        await api.publishVote(r.id, albums)
+        await api.publishVote(r.id, albums, filler)
       } else {
         await api.publishDraw(r.id, { album: albums[0], filler })
       }
     } catch (e) {
       fail(e as Error)
+      api.backToChoosing(r.id).catch(() => {}) // não deixa a rodada presa na animação
     } finally {
-      setBusy(null)
+      setBusy(false)
     }
   }
+
+  /** Líder com a busca parada (recarregou a página no meio): tentar de novo ou desistir. */
+  const stuck = (r: Round) =>
+    isLeader && !busy ? (
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-3">
+        <Button size="lg" className="w-full" onClick={() => run(r)}><RotateCcw /> Tentar de novo</Button>
+        <Button variant="outline" size="lg" className="w-full" onClick={() => api.backToChoosing(r.id).then(refresh, fail)}><Undo2 /> Voltar às escolhas</Button>
+      </div>
+    ) : null
 
   /** Sorteia o jeito da rodada (sorteio ou votação, e bandas, gêneros ou álbuns) sempre diferente do que já está marcado. */
   function shuffleSetup() {
@@ -168,16 +217,10 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
     sfx.click()
   }
 
-  async function saveProfile(e: React.FormEvent) {
-    e.preventDefault()
-    if (!me) return
-    if (lastfm.trim() && !(await lastfmUserExists(lastfm.trim()))) return fail(new Error('Usuário do Last.fm não encontrado.'))
-    api.updateProfile(group.id, me.name, lastfm).then(() => toast.success('Perfil salvo'), fail)
-  }
-
   if (!me) return null
   const lobbyRound = round?.status === 'done' ? round : null
   const winner = lobbyRound?.result?.album
+  const tied = lobbyRound?.kind === 'vote' ? lobbyRound.result?.tied : undefined
 
   return (
     <main className="mx-auto max-w-6xl px-4 pb-14 pt-4 sm:pt-6">
@@ -238,17 +281,19 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
                   {leaderStale && (
                     <Button variant="secondary" onClick={() => api.claimLeadership(group.id).then(refresh, fail)}>O líder sumiu há 7+ dias: assumir liderança</Button>
                   )}
-                  <details className="text-sm">
-                    <summary className="flex min-h-11 cursor-pointer items-center gap-2 font-semibold underline underline-offset-4"><LastfmIcon className="size-4" />Meu perfil{lastfmEnabled ? ' · Last.fm' : ''}</summary>
-                    {lastfmEnabled ? (
-                      <form onSubmit={saveProfile} className="mt-1 flex gap-2">
-                        <Input value={lastfm} onChange={(e) => setLastfm(e.target.value)} placeholder="Usuário do Last.fm (evita álbuns que você já ouviu)" aria-label="Usuário do Last.fm" maxLength={40} />
-                        <Button type="submit" variant="outline"><LastfmIcon /> Salvar</Button>
-                      </form>
-                    ) : (
-                      <p className="mt-1 text-muted-foreground">O filtro de álbuns já escutados precisa de uma chave da API do Last.fm (VITE_LASTFM_KEY).</p>
-                    )}
-                  </details>
+                  {isLeader && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {sure ? (
+                        <>
+                          <p className="w-full text-sm font-semibold">Apagar “{group.name}” e todo o histórico, para todos?</p>
+                          <Button variant="destructive" size="sm" onClick={() => api.deleteGroup(group.id).then(() => { forgetGroup(group.id); nav('/') }, fail)}><Trash2 /> Sim, excluir grupo</Button>
+                          <Button variant="outline" size="sm" onClick={() => setSure(false)}>Cancelar</Button>
+                        </>
+                      ) : (
+                        <Button variant="outline" size="sm" onClick={() => setSure(true)}><Trash2 /> Excluir grupo</Button>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </Section>
@@ -261,8 +306,10 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
             <Section title={isLeader ? 'Nova rodada' : 'Aguardando o líder'} hint={isLeader ? 'Escolha como a rodada vai rolar. Depois cada um escolhe até 5 e o sistema cuida do resto.' : `O líder vai iniciar a rodada #${nextNo}.`}>
               {lobbyRound && winner && (
                 <div className="space-y-4">
-                  <p className="text-sm text-muted-foreground">Rodada #{total} ({lobbyRound.kind === 'vote' ? 'votação' : 'sorteio'}): o álbum da vez</p>
-                  <AlbumCard album={winner} />
+                  <p className="text-sm text-muted-foreground">
+                    Rodada #{total} ({lobbyRound.kind === 'vote' ? 'votação' : 'sorteio'}{tied && tied.length > 1 ? `, empate entre ${tied.length}` : ''}): o álbum da vez
+                  </p>
+                  {tied && tied.length > 1 ? <Reveal round={lobbyRound} album={winner} pool={tied}>{() => null}</Reveal> : <AlbumCard album={winner} />}
                 </div>
               )}
               {isLeader && (
@@ -299,28 +346,30 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
                 <p className="text-muted-foreground">Você entrou com a rodada em andamento: participa da próxima.</p>
               )}
               {isLeader && (
-                <Button size="lg" disabled={!allReady || !!busy} onClick={() => run(active)}>
-                  {busy ? <><Loader2 className="animate-spin" /> {busy}</> : allReady ? (active.kind === 'vote' ? <><Vote /> Iniciar votação</> : <><Shuffle /> Sortear álbum</>) : 'Aguardando todos confirmarem…'}
+                <Button size="lg" disabled={!allReady || busy} onClick={() => run(active)}>
+                  {busy ? <Loader2 className="animate-spin" /> : allReady ? (active.kind === 'vote' ? <><Vote /> Iniciar votação</> : <><Shuffle /> Sortear álbum</>) : 'Aguardando todos confirmarem…'}
                 </Button>
               )}
             </Section>
           )}
 
           {/* ---------- sorteio em andamento */}
-          {active?.status === 'drawing' && active.result && (
+          {active?.status === 'drawing' && (
             <Section title="Sorteio" hint={`Rodada #${total}`}>
-              <Reveal round={active} album={active.result.album} pool={active.result.filler ?? []}>
+              <Reveal round={active} album={active.result?.album} pool={active.result?.filler ?? []}>
                 {(rolled) =>
                   rolled && isLeader ? (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-3">
                       <Button size="lg" className="w-full" onClick={() => api.confirmDraw(active.id).then(refresh, fail)}><CircleCheck /> Vamos ouvir esse</Button>
-                      <Button variant="outline" size="lg" className="w-full" disabled={!!busy} onClick={() => run(active)}>
-                        {busy ? <><Loader2 className="animate-spin" /> {busy}</> : <><RotateCcw /> Sortear de novo</>}
+                      <Button variant="outline" size="lg" className="w-full" disabled={busy} onClick={() => run(active)}>
+                        {busy ? <Loader2 className="animate-spin" /> : <RotateCcw />} Sortear de novo
                       </Button>
                       <Button variant="outline" size="lg" className="w-full" onClick={() => api.backToChoosing(active.id).then(refresh, fail)}><Undo2 /> Voltar às escolhas</Button>
                     </motion.div>
                   ) : rolled ? (
                     <p className="text-sm text-muted-foreground">Aguardando o líder confirmar ou sortear de novo…</p>
+                  ) : !active.result ? (
+                    stuck(active)
                   ) : null
                 }
               </Reveal>
@@ -328,10 +377,11 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
           )}
 
           {/* ---------- votação */}
-          {active?.status === 'voting' && active.candidates && (
+          {active?.status === 'voting' && (
             <Section title="Votação" hint={`Rodada #${total} · seu voto é secreto até todos votarem. Dá para trocar antes de encerrar.`}>
-              <VotePanel roundId={active.id} candidates={active.candidates} myVote={votes.find((v) => v.member_id === me.id)?.album_id} />
-              {isLeader && !allVoted && (
+              <VotePanel roundId={active.id} candidates={active.candidates} filler={(active.result as { filler?: Album[] } | null)?.filler} reveal={active.mode !== 'album'} myVote={votes.find((v) => v.member_id === me.id)?.album_id} />
+              {!active.candidates && stuck(active)}
+              {isLeader && active.candidates && !allVoted && (
                 <Button variant="outline" onClick={() => api.closeVote(active.id).catch(fail)}><CircleCheck /> Encerrar votação agora</Button>
               )}
             </Section>
@@ -339,6 +389,7 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
 
         </div>
       </div>
+      <Footer />
     </main>
   )
 }

@@ -1,6 +1,9 @@
 import { motion } from 'motion/react'
 import { Volume2, VolumeX } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useMuted } from '@/lib/sound'
+import { GithubIcon } from './Brand'
+import { GroupsMenu } from './GroupsMenu'
 import { cn } from '@/lib/utils'
 
 
@@ -143,17 +146,38 @@ export function Logo({ className }: { className?: string }) {
   )
 }
 
-/** Cabeçalho de jornal: marca, data de hoje e o que mais couber à direita. */
+/** Cabeçalho de jornal: a marca (leva à tela inicial) e o que mais couber à direita. */
 export function Masthead({ children }: { children?: React.ReactNode }) {
-  const raw = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-  const date = raw.charAt(0).toUpperCase() + raw.slice(1)
   return (
     <div className="flex items-center justify-between gap-x-4 gap-y-2 border-b-[3px] border-foreground pb-3">
-      <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-1">
+      <Link to="/" aria-label={`${BRAND}: tela inicial`} className="min-w-0">
         <Logo />
-        <span className="text-sm font-medium text-muted-foreground">{date}</span>
+      </Link>
+      <div className="flex shrink-0 items-center gap-2">
+        <GroupsMenu />
+        {children}
       </div>
-      {children}
     </div>
+  )
+}
+
+/** Rodapé do jornal: a linha de copyright e o repositório (só a marca do GitHub). Vai dentro do `main` de cada tela, para ter a mesma largura dela. */
+export function Footer() {
+  return (
+    <footer className="mt-12">
+      <div className="flex items-center justify-between gap-4 border-t-[3px] border-foreground pt-3">
+        <p className="text-sm font-medium text-muted-foreground">© 2026 FLTR Systems</p>
+        <a
+          href="https://github.com/fernandofilter/album-sort"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Repositório no GitHub"
+          title="Repositório no GitHub"
+          className="grid size-11 place-items-center rounded border-[1.5px] border-foreground bg-card transition-colors hover:bg-muted"
+        >
+          <GithubIcon className="size-5" />
+        </a>
+      </div>
+    </footer>
   )
 }

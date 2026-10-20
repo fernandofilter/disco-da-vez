@@ -2,18 +2,16 @@ import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
-import { lastfmEnabled, lastfmUserExists } from '@/lib/lastfm'
 import { sfx } from '@/lib/sound'
 import { Button } from './ui/button'
 import { Card } from './ui/card'
 import { Input } from './ui/input'
 import { Skeleton } from './ui/skeleton'
-import { Masthead, SoundToggle, TarjaBand } from './Guide'
+import { Masthead, SoundToggle, TarjaBand, Footer } from './Guide'
 
 export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void }) {
   const [preview, setPreview] = useState<Awaited<ReturnType<typeof api.preview>> | false | undefined>(undefined)
   const [name, setName] = useState('')
-  const [lastfm, setLastfm] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
@@ -24,8 +22,7 @@ export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void 
     e.preventDefault()
     setBusy(true)
     try {
-      if (lastfm.trim() && !(await lastfmUserExists(lastfm.trim()))) throw new Error('Usuário do Last.fm não encontrado.')
-      await api.join(gid, name, lastfm)
+      await api.join(gid, name)
       onJoined()
     } catch (err) {
       sfx.error()
@@ -52,14 +49,12 @@ export function JoinForm({ gid, onJoined }: { gid: string; onJoined: () => void 
       <motion.form onSubmit={join} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, delay: 0.3, ease: [0.22, 1, 0.36, 1] }} className="mt-8">
         <Card className="gap-4 rounded-none border-t-[6px] p-5">
           <Input aria-label="Seu nome" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required autoFocus />
-          {lastfmEnabled && (
-            <Input aria-label="Usuário do Last.fm" placeholder="Usuário do Last.fm (opcional, evita álbuns que você já ouviu)" value={lastfm} onChange={(e) => setLastfm(e.target.value)} maxLength={40} />
-          )}
           <Button type="submit" size="lg" disabled={busy || !name.trim() || preview.member_count >= 6}>
             {preview.member_count >= 6 ? 'Grupo cheio' : busy ? 'Entrando…' : 'Entrar no grupo'}
           </Button>
         </Card>
       </motion.form>
+      <Footer />
     </main>
   )
 }

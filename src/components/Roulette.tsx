@@ -1,6 +1,6 @@
 import { animate, motion, useMotionValue } from 'motion/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { seeded } from '@/lib/draw'
+import { buildTape, seeded } from '@/lib/draw'
 import { sfx } from '@/lib/sound'
 import type { Album } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -10,7 +10,7 @@ const W = 132 // largura do card
 const GAP = 10
 const WIN_IDX = 46
 const TOTAL = 58
-const SECONDS = 7
+const SECONDS = 11 // devagar de propósito: a fita se arrasta pelos vizinhos antes de parar, para dar tensão
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 interface Props {
@@ -37,12 +37,7 @@ export function Roulette({ winner, pool, seed, spinKey, skip, onDone }: Props) {
   const poolKey = pool.map((a) => a.id).join()
   const { items, jitter } = useMemo(() => {
     const rng = seeded(`${seed}:${spinKey}`)
-    const fill = pool.filter((a) => a.id !== winner.id)
-    const order = fill.length ? fill.map((_, i) => i).sort(() => rng() - 0.5) : []
-    const list: Album[] = Array.from({ length: TOTAL }, (_, i) =>
-      i === WIN_IDX ? winner : fill.length ? fill[order[i % order.length]] : { id: `ph${i}`, title: '?', artist: '' },
-    )
-    return { items: list, jitter: (rng() - 0.5) * W * 0.6 }
+    return { items: buildTape(pool, winner, TOTAL, WIN_IDX, rng), jitter: (rng() - 0.5) * W * 0.6 }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [winner.id, poolKey, seed, spinKey])
 
@@ -105,7 +100,7 @@ export function Roulette({ winner, pool, seed, spinKey, skip, onDone }: Props) {
         <div aria-hidden className="pointer-events-none absolute bottom-12 top-0 left-1/2 w-[2px] -translate-x-1/2 bg-foreground" />
         <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 size-0 -translate-x-1/2 border-x-[7px] border-t-[10px] border-x-transparent border-t-live" />
       </div>
-      <p className="mt-2 text-center text-sm font-bold uppercase tracking-wide text-muted-foreground">{done ? 'Álbum da noite' : 'Sorteando…'}</p>
+      <p aria-live="polite" className={cn('mt-2 text-balance px-2 text-center font-bold uppercase', done ? 'text-lg tracking-wide text-foreground' : 'text-sm tracking-wide text-muted-foreground')}>{done ? winner.title : 'Sorteando…'}</p>
     </div>
   )
 }

@@ -1,20 +1,25 @@
 import { motion } from 'motion/react'
-import { ArrowLeft, Shuffle, Vote } from 'lucide-react'
+import { ArrowLeft, Shuffle, Trash2, Vote } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Link, useParams } from 'react-router-dom'
 import { SpotifyIcon, YtMusicIcon } from '@/components/Brand'
-import { Cover } from '@/components/Cover'
-import { Masthead, SoundToggle } from '@/components/Guide'
-import { buttonVariants } from '@/components/ui/button'
+import { CoverZoom } from '@/components/CoverZoom'
+import { Masthead, SoundToggle, Footer } from '@/components/Guide'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGroup } from '@/hooks/useGroup'
+import { api } from '@/lib/api'
 import { spotifySearch, ytmusicSearch } from '@/lib/musicbrainz'
 import type { GroupState } from '@/hooks/useGroup'
 import { cn } from '@/lib/utils'
 
 const when = (iso: string) => new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })
 
-export function Rounds({ data }: { data: GroupState }) {
-  const { group, history, rounds } = data
+export function Rounds({ data, refresh }: { data: GroupState; refresh?: () => void }) {
+  const { group, history, rounds, userId } = data
+  const isLeader = group.leader_id === userId
+  const [asking, setAsking] = useState<string | null>(null) // item esperando confirmação de exclusão
   // a numeração é a posição da rodada na ordem de criação, a mesma do #N da tela do grupo
   const meta = new Map(rounds.map((r, i) => [r.id, { no: i + 1, kind: r.kind, mode: r.mode }]))
   const items = history.map((h) => ({ h, r: h.round_id ? meta.get(h.round_id) : undefined }))
@@ -33,7 +38,7 @@ export function Rounds({ data }: { data: GroupState }) {
         <p className="tnum text-base font-medium">
           <span className="font-bold">{group.name}</span> · {rounds.length} {rounds.length === 1 ? 'rodada' : 'rodadas'} · {history.length} {history.length === 1 ? 'álbum ouvido' : 'álbuns ouvidos'}
         </p>
-        <p className="text-sm text-muted-foreground">Os álbuns daqui nunca mais entram nos sorteios deste grupo.</p>
+        <p className="text-sm text-muted-foreground">Os álbuns daqui nunca mais entram nos sorteios deste grupo.{isLeader && ' Excluir um item libera o álbum para voltar a ser sorteado.'}</p>
       </header>
 
       {items.length === 0 ? (
@@ -49,7 +54,7 @@ export function Rounds({ data }: { data: GroupState }) {
               className="grid grid-cols-[3.25rem_5rem_minmax(0,1fr)] items-start gap-x-3 p-3 sm:grid-cols-[4rem_7rem_minmax(0,1fr)] sm:gap-x-4 sm:p-4"
             >
               <span className="tnum pt-1 text-3xl font-extrabold leading-none sm:text-4xl" style={{ fontStretch: '62%' }}>{r ? `#${r.no}` : '–'}</span>
-              <Cover album={h.album} size={250} className="w-full" />
+              <CoverZoom album={h.album} size={250} className="w-full" />
               <div className="min-w-0 space-y-1">
                 <h2 className="text-xl leading-none sm:text-2xl">{h.album.title}</h2>
                 <p className="text-sm font-semibold">{h.album.artist}{h.album.year ? ` · ${h.album.year}` : ''}</p>
@@ -67,19 +72,29 @@ export function Rounds({ data }: { data: GroupState }) {
                   <a href={ytmusicSearch(h.album)} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}>
                     <YtMusicIcon className="size-4" /> YouTube Music
                   </a>
+                  {isLeader &&
+                    (asking === h.id ? (
+                      <>
+                        <Button variant="destructive" size="sm" onClick={() => api.deleteHistoryItem(h.id).then(() => { setAsking(null); refresh?.() }, (e: Error) => toast.error(e.message))}><Trash2 /> Excluir mesmo</Button>
+                        <Button variant="outline" size="sm" onClick={() => setAsking(null)}>Cancelar</Button>
+                      </>
+                    ) : (
+                      <Button variant="outline" size="sm" className="w-full" onClick={() => setAsking(h.id)}><Trash2 /> Excluir do histórico</Button>
+                    ))}
                 </div>
               </div>
             </motion.li>
           ))}
         </ol>
       )}
+      <Footer />
     </main>
   )
 }
 
 export default function GroupHistoryPage() {
   const { id = '' } = useParams()
-  const { state } = useGroup(id)
+  const { state, refresh } = useGroup(id)
   if (state.status === 'loading') return <Skeleton className="mx-auto mt-24 h-64 max-w-md" />
   if (state.status === 'error') return <p className="mt-24 text-center text-destructive">{state.message}</p>
   if (state.status === 'outsider') {
@@ -89,5 +104,5 @@ export default function GroupHistoryPage() {
       </p>
     )
   }
-  return <Rounds data={state.data} />
+  return <Rounds data={state.data} refresh={refresh} />
 }

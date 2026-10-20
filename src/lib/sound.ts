@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react'
 const KEY = 'album-sort:muted'
 const read = () => {
   try {
-    return localStorage.getItem(KEY) !== '0' // desligado por padrão: só liga quem escolheu ligar
+    return localStorage.getItem(KEY) === '1' // ligado por padrão: só fica mudo quem desligou
   } catch {
     return false
   }
@@ -80,39 +80,43 @@ export const sfx = {
     hit(a, t, 0.025, 3200, 1.6, 0.3)
     tone(a, t, 520, 0.03, 0.12, 'square', 0.001, 300)
   },
-  /** letra batendo no teleimpressor, uma por capa que passa; `speed` de 0 a 1 */
+  /** a palheta da roleta batendo num pino: um "toc" de madeira por capa que passa; `speed` de 0 a 1 (mais rápido = mais forte e mais agudo) */
   tick(speed = 0.5) {
     const a = audio()
     if (!a) return
-    hit(a, a.c.currentTime, 0.012, 2000 + speed * 1800, 2.4, 0.1 + speed * 0.14)
+    const t = a.c.currentTime
+    const v = 0.94 + Math.random() * 0.12 // nenhum toc sai idêntico ao outro
+    hit(a, t, 0.02, (1300 + speed * 900) * v, 2.6, 0.2 + speed * 0.16)
+    tone(a, t, (250 + speed * 170) * v, 0.06, 0.2 + speed * 0.12, 'triangle', 0.001, 150)
   },
-  /** teleimpressor rodando durante a fita do sorteio */
+  /** o giro começando: um sopro curto de ar sob a fita (o resto do som são os tocs) */
   spin(seconds: number) {
     const a = audio()
     if (!a) return
     stopSpin?.()
     const t = a.c.currentTime
+    const dur = Math.min(1.2, seconds * 0.25)
     const s = a.c.createBufferSource()
     s.buffer = a.buf
     s.loop = true
     const f = a.c.createBiquadFilter()
     f.type = 'bandpass'
-    f.Q.value = 1.4
-    f.frequency.setValueAtTime(1800, t)
-    f.frequency.exponentialRampToValueAtTime(3600, t + seconds * 0.3)
-    f.frequency.exponentialRampToValueAtTime(1400, t + seconds)
+    f.Q.value = 0.9
+    f.frequency.setValueAtTime(500, t)
+    f.frequency.exponentialRampToValueAtTime(2400, t + dur * 0.4)
+    f.frequency.exponentialRampToValueAtTime(700, t + dur)
     const g = a.c.createGain()
     g.gain.setValueAtTime(0.0001, t)
-    g.gain.linearRampToValueAtTime(0.07, t + 0.4)
-    g.gain.linearRampToValueAtTime(0.02, t + seconds)
+    g.gain.linearRampToValueAtTime(0.06, t + dur * 0.3)
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
     s.connect(f).connect(g).connect(a.out)
     s.start(t)
+    s.stop(t + dur + 0.05)
     const stop = () => {
       const n = a.c.currentTime
       g.gain.cancelScheduledValues(n)
-      g.gain.setValueAtTime(g.gain.value, n)
-      g.gain.linearRampToValueAtTime(0.0001, n + 0.05)
-      s.stop(n + 0.08)
+      g.gain.setValueAtTime(Math.max(g.gain.value, 0.0001), n)
+      g.gain.linearRampToValueAtTime(0.0001, n + 0.04)
       if (stopSpin === stop) stopSpin = null
     }
     stopSpin = stop
@@ -121,17 +125,28 @@ export const sfx = {
   hush() {
     stopSpin?.()
   },
-  /** a fita parou no álbum da noite: carimbo e gongo de abertura de programa */
+  /** a fita parou: a palheta cai no último pino e o carimbo bate */
   lock() {
     stopSpin?.()
     const a = audio()
     if (!a) return
-    const t = a.c.currentTime + 0.06
-    hit(a, t, 0.06, 700, 1.1, 0.5)
-    tone(a, t, 120, 0.12, 0.4, 'sine', 0.002, 60)
-    tone(a, t + 0.1, 659.3, 1.4, 0.13, 'triangle', 0.004)
-    tone(a, t + 0.1, 830.6, 1.4, 0.09, 'triangle', 0.004)
-    tone(a, t + 0.26, 987.8, 1.6, 0.1, 'sine', 0.004)
+    const t = a.c.currentTime + 0.04
+    hit(a, t, 0.07, 700, 1.1, 0.55)
+    tone(a, t, 130, 0.16, 0.45, 'sine', 0.002, 55)
+    tone(a, t, 330, 0.09, 0.2, 'triangle', 0.001, 180)
+  },
+  /** álbum definido (sorteio, desempate ou votação): fanfarra curta de abertura de programa, subindo até a oitava */
+  win() {
+    const a = audio()
+    if (!a) return
+    const t = a.c.currentTime + 0.02
+    ;[523.3, 659.3, 784, 1046.5].forEach((f, i) => {
+      tone(a, t + i * 0.09, f, 0.5 + i * 0.12, 0.13, 'triangle', 0.005)
+      tone(a, t + i * 0.09, f * 2, 0.35, 0.04, 'sine', 0.005)
+    })
+    tone(a, t + 0.36, 1318.5, 1.6, 0.11, 'sine', 0.006) // o sino final, que fica no ar
+    tone(a, t + 0.36, 523.3, 1.6, 0.08, 'triangle', 0.006)
+    hit(a, t + 0.36, 0.25, 5200, 2, 0.12)
   },
   /** voto carimbado */
   vote() {

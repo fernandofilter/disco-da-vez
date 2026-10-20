@@ -16,6 +16,10 @@ import type { Album, Member, Round, RoundChoice } from '@/lib/types'
 function Room({ scenario }: { scenario: string }) {
   const [albums, setAlbums] = useState<Album[]>([])
   const [spin, setSpin] = useState(1)
+  const [arrived, setArrived] = useState(scenario !== 'deal') // `deal`: a votação abre sem álbuns e eles chegam 2,5 s depois
+  useEffect(() => {
+    if (scenario === 'deal') setTimeout(() => setArrived(true), 2500)
+  }, [scenario])
   useEffect(() => {
     searchArtists('Radiohead').then(([a]) => artistAlbums(a)).then(setAlbums, () => setAlbums([]))
   }, [])
@@ -23,11 +27,12 @@ function Room({ scenario }: { scenario: string }) {
   const names = ['Fernando', 'Bia', 'Caio', 'Dani']
   const members: Member[] = names.map((name, i) => ({ id: `m${i}`, group_id: 'g', user_id: `u${i}`, name, lastfm_user: i === 1 ? 'bia_fm' : null, last_choices: {}, last_seen: now, joined_at: now }))
   const live = scenario === 'spin' || spin > 1
-  const status = scenario === 'idle' ? null : scenario === 'choosing' ? 'choosing' : scenario === 'voting' ? 'voting' : 'drawing'
+  const status = scenario === 'idle' ? null : scenario === 'choosing' ? 'choosing' : scenario === 'voting' || scenario === 'deal' ? 'voting' : 'drawing'
   const round: Round | null = status
     ? {
-        id: 'r1', group_id: 'g', mode: 'artist', kind: scenario === 'voting' ? 'vote' : 'draw', status, participants: members.map((m) => m.id),
-        candidates: scenario === 'voting' ? albums.slice(0, 6) : null,
+        id: 'r1', group_id: 'g', mode: 'artist', kind: scenario === 'voting' || scenario === 'deal' ? 'vote' : 'draw', status, participants: members.map((m) => m.id),
+        candidates: (scenario === 'voting' || scenario === 'deal') && arrived && albums.length ? albums.slice(0, 6) : null,
+        ...(scenario === 'deal' && arrived && albums.length ? { result: { filler: albums } as never } : {}),
         result: (scenario === 'drawing' || scenario === 'spin') && albums.length ? { album: albums[3] ?? albums[0], filler: albums } : null,
         spin, result_at: new Date(Date.now() - (live ? 0 : 60_000)).toISOString(),
       }

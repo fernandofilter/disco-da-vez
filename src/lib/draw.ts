@@ -35,7 +35,7 @@ export interface Candidate {
 export interface DrawInput {
   members: { id: string; choices: Choice[] }[]
   pool(choice: Choice): Promise<Candidate[]>
-  /** Capa existe e nenhum membro vinculado já escutou. */
+  /** O álbum tem capa (única regra de aceite). */
   accept(album: Album): Promise<boolean>
   /** ids de álbuns já no histórico do grupo */
   exclude: Set<string>
@@ -48,7 +48,7 @@ const BATCH = 4
 
 /**
  * Membro uniforme → escolha uniforme → álbum uniforme. Se uma ponta não rende álbum
- * (pool vazio, tudo já escutado), cai para a próxima na ordem sorteada.
+ * (pool vazio, tudo já no histórico ou sem capa), cai para a próxima na ordem sorteada.
  */
 export async function pickAlbums(input: DrawInput, count: number): Promise<{ albums: Album[]; seen: Album[] }> {
   const rng = input.rng ?? Math.random
@@ -67,7 +67,7 @@ export async function pickAlbums(input: DrawInput, count: number): Promise<{ alb
           continue
         }
         const fresh = shuffle(pool, rng).filter((c) => !exclude.has(c.key) && !rejected.has(c.key))
-        // verifica em lotes paralelos (capa/Last.fm são requisições lentas); vale o primeiro aceito na ordem sorteada
+        // verifica em lotes paralelos (a checagem de capa é uma requisição lenta); vale o primeiro aceito na ordem sorteada
         const tries = fresh.slice(0, MAX_TRIES_PER_CHOICE)
         for (let i = 0; i < tries.length; i += BATCH) {
           const batch = await Promise.all(
@@ -97,4 +97,32 @@ export async function pickAlbums(input: DrawInput, count: number): Promise<{ alb
     input.onProgress?.(albums.length, count)
   }
   return { albums, seen }
+}
+
+/**
+ * A fita da roleta: `length` capas em ordem aleatória, com o vencedor em `winIdx`.
+ * O vencedor também sai do mesmo "saquinho" das outras capas, então aparece em outros pontos da fita (nunca ao lado dele mesmo),
+ * e ninguém se repete dentro das últimas posições: não há ciclo para o olho aprender nem um intruso que entrega o resultado.
+ * Com só um álbum disponível sobram capas em branco ("ph…") nas demais posições.
+ */
+export function buildTape(pool: Album[], winner: Album, length: number, winIdx: number, rng: Rng): Album[] {
+  const all = [...new Map([...pool, winner].map((a) => [a.id, a])).values()]
+  const recent = Math.min(4, all.length - 1)
+  const tape: Album[] = []
+  let bag: Album[] = []
+  for (let i = 0; i < length; i++) {
+    if (i === winIdx) {
+      tape.push(winner)
+      continue
+    }
+    if (all.length < 2) {
+      tape.push({ id: `ph${i}`, title: '?', artist: '' })
+      continue
+    }
+    if (!bag.length) bag = shuffle(all, rng)
+    const last = tape.slice(-recent)
+    const k = bag.findIndex((a) => !last.some((t) => t.id === a.id) && !(a.id === winner.id && Math.abs(i - winIdx) <= 1))
+    tape.push(bag.splice(Math.max(k, 0), 1)[0])
+  }
+  return tape
 }
