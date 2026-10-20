@@ -112,7 +112,7 @@ components:
 
 The group's night is one printed page of TV listings. Every person is a row, every step is a time slot, and the drawn album is the prime-time program. The surface is cool newsprint with a light paper grain, set in near-black ink, divided by 1.5px rules. Nothing is lit, glassy or glowing; the page is read, not watched.
 
-The mood is flat, printed, structural and quick to scan. Colour is rationed to meaning: one blue marks you (your row, your chip, your slot in the band), a red dot means "live, do this now", and everyone and everything else is ink on paper. State is read from shape, not hue, so the page works in a glance and in greyscale. Sound completes the print metaphor: pen clicks, teleprinter ticks, a stamp thud and a short programme-opening chime, all synthesized with Web Audio. Sound is off by default; the masthead icon toggle turns it on and the choice is remembered.
+The mood is flat, printed, structural and quick to scan. Colour is rationed to meaning: one blue marks you (your row, your chip, your slot in the band), a red dot means "live, do this now", and everyone and everything else is ink on paper. State is read from shape, not hue, so the page works in a glance and in greyscale. Sound completes the print metaphor: pen clicks, teleprinter ticks, a stamp thud and a short programme-opening chime, all synthesized with Web Audio. Sound is on by default; the masthead icon toggle mutes it and the choice is remembered.
 
 The previous valve-radio world was rejected as too decorative; its teal, amber, brass, glass and radio imagery do not return.
 
@@ -222,7 +222,7 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - Two columns (three from 640px) of boxes with cover, title, artist and a mark. The picked tile inverts to full ink with a filled mark. Unpicked tiles carry the empty outlined square. Tiles enter with a 60ms stagger, 0.35s.
 
 ### Roulette
-- A tape of covers (132px wide, 10px gap) slides under a fixed 2px ink needle with a red triangle tip, over a recessed muted window with a ruler strip along the top. It runs 7 seconds on a hard-decelerating curve, then the winner scales to 1.05 with a 3px ink ring while the rest dim to 35% and greyscale. Caption flips from "Sorteando..." to "Album da noite". Under reduced motion it jumps to the result.
+- A tape of covers (132px wide, 10px gap) slides under a fixed 2px ink needle with a red triangle tip, over a recessed muted window with a ruler strip along the top. It runs 7 seconds on a hard-decelerating curve, then the winner scales to 1.05 with a 3px ink ring while the rest dim to 35% and greyscale. Caption flips from "Sorteando..." to the winning album title. Under reduced motion it jumps to the result.
 
 ### Logo and Masthead
 - **Mark:** a 32px ink square with a 6px-of-64 corner (the favicon uses 8), a paper disc inside, a groove ring and centre hole in ink, and a small Live Red dot at the top-right corner outlined in paper. The disc and outline follow the page paper; the favicon repeats the mark with literal colours (#15171c ink, #f2f3f6 paper, #dc2a2b red).
@@ -230,7 +230,7 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - **Rules:** the red dot is the same Live Red as the AGORA dot and never changes; the mark never takes You Red or any other colour; no gradients, glow or extra detail are added to the disc.
 
 ### Sound
-- Web Audio only, no files, master gain 0.6 through a limiter. Pen-click on every button or option, per-cover teleprinter tick with a looping noise tape during the spin, a stamp thud on a vote or a ready mark, a two-note join chime, a low buzz on error, and a stamp plus a short bell-like chord when the tape locks on the winner. The Som toggle sits in the masthead as an icon only: a 44px square, 1.5px ink border, card fill, Volume2 or VolumeX, fixed aria-label "Som" with aria-pressed carrying the state. It starts off and remembers a change once made.
+- Web Audio only, no files, master gain 0.6 through a limiter. Pen-click on every button or option, per-cover teleprinter tick with a looping noise tape during the spin, a stamp thud on a vote or a ready mark, a two-note join chime, a low buzz on error, and a stamp plus a short bell-like chord when the tape locks on the winner. The Som toggle sits in the masthead as an icon only: a 44px square, 1.5px ink border, card fill, Volume2 or VolumeX, fixed aria-label "Som" with aria-pressed carrying the state. It starts on and remembers a change once made. The roulette sounds like a wheel: a wooden flapper "toc" per cover that passing (pitch and force follow the speed, never two identical), a thud when the tape locks, and a short rising fanfare plus a bell when the album is defined (draw, tie-break roulette, or a vote closed without tie).
 
 ### History
 - Covers in a 3 to 6 column grid, each under a 3px ink rule, with title and artist truncated.
@@ -269,3 +269,23 @@ Crisp and ruled. Controls, boxes, badges and chips use a 4px corner (badges 60% 
 - **Brand icons (`Brand.tsx`):** Spotify and YouTube Music are authored one-colour marks; Last.fm is the official Simple Icons `lastdotfm` path. All use currentColor, so they stay ink on paper and invert on ink buttons. No brand colours.
 - **Roulette:** after the tape locks on the winner it holds 1.6s, then leaves and only the album card remains. The lobby shows the result only.
 - **Favicon:** `public/favicon.svg` is the source; `node scripts/make-icons.mjs` regenerates `favicon.ico`, `icon-192.png`, `icon-512.png` and `apple-touch-icon.png`.
+
+## Addendum: screens as steps, cover zoom, album card, footer
+
+- **One screen per step.** Choosing, and the draw or vote, are separate screens. In a group the people grid is shown only before and during choosing; the draw and the vote take the whole column and the page scrolls to top on each step change. Solo (`/solo`, no account, no group, stored in localStorage) has the same two screens: choices, then a draw screen with "Voltar às escolhas"; its action reads "Vou ouvir esse" (singular), the group's stays "Vamos ouvir esse".
+- **Masthead:** the logo and wordmark are one link to Home; the date is gone. Right side: "Grupos" (opens a dialog listing this device's groups with member counts), then page actions, then the sound toggle. Footer on every screen: a 3px ink rule, "© 2026 FLTR Systems" in Soft Ink and a 44px square GitHub-mark button (outline style) linking to the repository.
+- **Album icon:** a drawn square sleeve holding a record (2px stroke, same weight as lucide), replacing the bookmark glyph.
+- **Cover zoom:** every cover in the album card and history tilts toward the pointer (max 9 degrees, spring, no touch, no reduced motion) and opens full screen on click: ink at 96% behind, the largest Cover Art Archive size (1200, falling back to 500), tilting up to 14 degrees; click anywhere, Esc or the close button dismiss.
+- **Album card:** a printed inlay. Left column: the cover over a ruled spec sheet (Ano, Faixas, Duração, Selo; empty values are omitted). Right column: title, artist, genre badges, then the listen buttons pinned to the bottom of the column on desktop. Below, across the full width, a ruled "Faixas" header (count and total time) and the tracklist in two columns from 768px. The track being previewed inverts to ink fill like a picked vote tile. No nested scroll area.
+
+## Addendum: garimpo loader, slower roulette, vinyl sides
+
+- **Garimpo (search wait):** a ruled box with "Garimpando álbuns…" in condensed caps, a full-width ink-striped bar (the same sliding stripes as the current stage, in ink instead of red) and one muted line. It is silent. It is the loading state for both the draw and the vote; no tape or slots move while it runs. The roulette tape (or the vote slots) enters only once the album(s) are known.
+- **Roulette:** 11 seconds on the same hard-decelerating curve, so the tape crawls past its neighbours before locking. Late arrivals skip the animation after 14 seconds. Tracklist and previews are prefetched while the tape spins.
+- **Sides:** when MusicBrainz has an official vinyl edition, the tracklist inserts "Lado A / B / C / D" rows (muted wash, 12px caps) where the side changes. No vinyl edition, or fewer than 60% of titles matching, means no side rows: sides are never invented.
+
+## Addendum: browser cache
+Discographies, album details, vinyl sides, genre counts and cover checks are cached in localStorage for 14 days (`src/lib/cache.ts`, key prefix `album-sort:cache:v1:`; bump `v1` when the album filter changes). Only data is cached, never a draw result: the random choice is still made over the list each time. Network-error guesses (cover assumed present) are not cached.
+
+## Addendum: roulette tape
+The tape is built by `buildTape` (`src/lib/draw.ts`): up to 60 distinct covers drawn from the picks of everyone (14 per choice), shuffled in a bag, no cover repeated within the last 4 slots, and the winner is part of the same bag, so it also scrolls by at other points (never next to the stopping slot). There is no repeating cycle and no outsider that gives the winner away. Tie roulettes alternate only the tied albums.

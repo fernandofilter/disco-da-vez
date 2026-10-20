@@ -5,6 +5,7 @@ import { supabaseConfigured } from '@/lib/supabase'
 import GroupPage from '@/pages/Group'
 import GroupHistoryPage from '@/pages/History'
 import Home from '@/pages/Home'
+import Solo from '@/pages/Solo'
 import Demo from '@/pages/Demo'
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
       ) : supabaseConfigured ? (
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/solo" element={<Solo />} />
           <Route path="/g/:id" element={<GroupPage />} />
           <Route path="/g/:id/historico" element={<GroupHistoryPage />} />
           <Route path="*" element={<Home />} />

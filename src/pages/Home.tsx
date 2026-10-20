@@ -1,33 +1,15 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowLeft, ArrowRight, Disc3, Headphones, KeyRound, Mic, Shuffle, Users } from 'lucide-react'
+import { ArrowLeft, Disc3, Headphones, KeyRound, Mic, Shuffle, User, Users } from 'lucide-react'
 import { lazy, Suspense, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { LastfmIcon } from '@/components/Brand'
-import { BRAND, Masthead, SoundToggle } from '@/components/Guide'
+import { BRAND, Masthead, SoundToggle, Footer } from '@/components/Guide'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
-import { lastfmEnabled, lastfmUserExists } from '@/lib/lastfm'
+import { rememberGroup } from '@/lib/groups'
 import { sfx } from '@/lib/sound'
-import { cn } from '@/lib/utils'
-
-const KEY = 'album-sort:groups'
-export const savedGroups = (): { id: string; name: string }[] => {
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '[]')
-  } catch {
-    return []
-  }
-}
-export const rememberGroup = (id: string, name: string) => {
-  try {
-    localStorage.setItem(KEY, JSON.stringify([{ id, name }, ...savedGroups().filter((g) => g.id !== id)].slice(0, 12)))
-  } catch {
-    /* storage bloqueado: só perde a lista de atalhos */
-  }
-}
 
 // o código do grupo é o id dele (o mesmo do link de convite): aceita o código puro ou o link colado
 const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
@@ -47,17 +29,14 @@ export default function Home() {
   const [view, setView] = useState<View>('start')
   const [group, setGroup] = useState('')
   const [name, setName] = useState('')
-  const [lastfm, setLastfm] = useState('')
   const [code, setCode] = useState('')
   const [busy, setBusy] = useState(false)
-  const mine = savedGroups()
 
   async function create(e: React.FormEvent) {
     e.preventDefault()
     setBusy(true)
     try {
-      if (lastfm.trim() && !(await lastfmUserExists(lastfm.trim()))) throw new Error('Usuário do Last.fm não encontrado.')
-      const id = await api.createGroup(group, name, lastfm)
+      const id = await api.createGroup(group, name)
       rememberGroup(id, group.trim())
       nav(`/g/${id}`)
     } catch (err) {
@@ -116,17 +95,17 @@ export default function Home() {
               <Button size="lg" className={START_BTN} onClick={() => setView('create')}>
                 <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
               </Button>
+              <Button size="lg" variant="outline" className={START_BTN} onClick={() => nav('/solo')}>
+                <User className="transition-transform duration-300 ease-out group-hover/button:scale-110" /> Jogar sozinho
+              </Button>
               <Button size="lg" variant="outline" className={START_BTN} onClick={() => setView('join')}>
                 <KeyRound className="transition-transform duration-300 ease-out group-hover/button:-rotate-12" /> Entrar em um grupo
               </Button>
             </motion.div>
-            <div className={cn('grid gap-10', mine.length > 0 && 'md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:gap-12')}>
-              <Steps />
-              {mine.length > 0 && <SavedGroups items={mine} />}
-            </div>
+            <Steps />
           </motion.div>
         ) : (
-          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className={cn('mt-10 grid gap-10', mine.length > 0 && 'md:grid-cols-2 md:gap-12')}>
+          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.4, ease: EASE }} className="mt-10 max-w-xl">
             {view === 'create' ? (
               <form onSubmit={create}>
                 <Card className="gap-3 rounded-none border-t-[6px] p-5">
@@ -134,12 +113,6 @@ export default function Home() {
                   <h2 className="text-3xl">Criar grupo</h2>
                   <Input aria-label="Nome do grupo" placeholder="Nome do grupo" value={group} onChange={(e) => setGroup(e.target.value)} maxLength={40} required autoFocus />
                   <Input aria-label="Seu nome" placeholder="Seu nome" value={name} onChange={(e) => setName(e.target.value)} maxLength={24} required />
-                  {lastfmEnabled && (
-                    <div className="relative">
-                      <LastfmIcon className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2" />
-                      <Input className="pl-11" aria-label="Usuário do Last.fm" placeholder="Usuário do Last.fm (opcional)" value={lastfm} onChange={(e) => setLastfm(e.target.value)} maxLength={40} />
-                    </div>
-                  )}
                   <Button type="submit" size="lg" disabled={busy || !group.trim() || !name.trim()}>
                     <Disc3 className={busy ? 'animate-spin' : ''} /> {busy ? 'Criando…' : 'Criar e convidar amigos'}
                   </Button>
@@ -158,10 +131,10 @@ export default function Home() {
                 </Card>
               </form>
             )}
-            {mine.length > 0 && <SavedGroups items={mine} />}
           </motion.div>
         )}
       </AnimatePresence>
+      <Footer />
     </main>
   )
 }
@@ -190,24 +163,6 @@ function Steps() {
           </motion.li>
         ))}
       </ol>
-    </section>
-  )
-}
-
-function SavedGroups({ items }: { items: { id: string; name: string }[] }) {
-  return (
-    <section aria-label="Seus grupos" className="space-y-3 border-t-[3px] border-foreground pt-3">
-      <h2 className="text-3xl">Seus grupos</h2>
-      <ul className="box divide-y divide-foreground/20 overflow-hidden">
-        {items.map((g, i) => (
-          <motion.li key={g.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, delay: 0.1 + i * 0.05, ease: EASE }}>
-            <Link to={`/g/${g.id}`} className="group/row flex min-h-14 items-center justify-between gap-3 bg-card px-4 py-2 text-lg font-bold transition-colors hover:bg-muted">
-              <span className="truncate">{g.name}</span>
-              <ArrowRight className="size-5 shrink-0 transition-transform duration-200 group-hover/row:translate-x-1" />
-            </Link>
-          </motion.li>
-        ))}
-      </ul>
     </section>
   )
 }

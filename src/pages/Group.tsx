@@ -4,7 +4,7 @@ import { GroupView } from '@/components/GroupView'
 import { JoinForm } from '@/components/JoinForm'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGroup } from '@/hooks/useGroup'
-import { rememberGroup } from './Home'
+import { rememberGroup } from '@/lib/groups'
 
 export default function GroupPage() {
   const { id = '' } = useParams()
