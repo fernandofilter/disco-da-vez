@@ -166,9 +166,14 @@ export function Footer() {
   return (
     <footer className="mt-12">
       <div className="flex items-center justify-between gap-4 border-t-[3px] border-foreground pt-3">
-        <p className="text-sm font-medium text-muted-foreground">© 2026 FLTR Systems</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          © 2026{' '}
+          <a href="https://fltr.com.br" target="_blank" rel="noreferrer" className="underline underline-offset-4 hover:text-foreground">
+            FLTR Systems
+          </a>
+        </p>
         <a
-          href="https://github.com/fernandofilter/album-sort"
+          href="https://github.com/fernandofilter/disco-da-vez"
           target="_blank"
           rel="noreferrer"
           aria-label="Repositório no GitHub"
