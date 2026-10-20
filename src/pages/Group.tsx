@@ -5,9 +5,11 @@ import { JoinForm } from '@/components/JoinForm'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGroup } from '@/hooks/useGroup'
 import { rememberGroup } from '@/lib/groups'
+import { parseGroupId } from '@/lib/invite'
 
 export default function GroupPage() {
-  const { id = '' } = useParams()
+  const { id: param = '' } = useParams()
+  const id = parseGroupId(param) ?? param
   const { state, refresh } = useGroup(id)
   const name = state.status === 'ready' ? state.data.group.name : null
 
