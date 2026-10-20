@@ -9,10 +9,8 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { api } from '@/lib/api'
 import { rememberGroup } from '@/lib/groups'
+import { parseGroupId } from '@/lib/invite'
 import { sfx } from '@/lib/sound'
-
-// o código do grupo é o id dele (o mesmo do link de convite): aceita o código puro ou o link colado
-const GROUP_CODE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
 
 // three.js só carrega na tela inicial, depois do primeiro desenho
 const Vinyl = lazy(() => import('@/components/Vinyl'))
@@ -48,7 +46,8 @@ export default function Home() {
 
   async function join(e: React.FormEvent) {
     e.preventDefault()
-    const id = code.match(GROUP_CODE)?.[0].toLowerCase()
+    // o código do grupo é o id dele (o mesmo do link de convite): aceita o código puro, o link ou a mensagem colada
+    const id = parseGroupId(code)
     setBusy(true)
     try {
       if (!id || !(await api.preview(id))) throw new Error('Código não encontrado. Confira com quem criou o grupo.')

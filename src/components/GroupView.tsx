@@ -15,6 +15,7 @@ import { ChoicePicker } from './ChoicePicker'
 import { Agora, Chip, Masthead, Segmented, SoundToggle, Stages, Footer } from './Guide'
 import type { MarkState } from './Guide'
 import { forgetGroup } from '@/lib/groups'
+import { inviteMessage } from '@/lib/invite'
 import { MemberList } from './MemberList'
 import { albumDetails, albumSides, artistAlbums } from '@/lib/musicbrainz'
 import { previews } from '@/lib/preview'
@@ -266,7 +267,7 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => navigator.clipboard.writeText(`${location.origin}/g/${group.id}`).then(() => toast.success('Link do convite copiado'), () => toast.error('Não consegui copiar'))}
+                      onClick={() => navigator.clipboard.writeText(inviteMessage(location.origin, group.id, group.name)).then(() => toast.success('Convite copiado'), () => toast.error('Não consegui copiar'))}
                     >
                       <Link2 /> Copiar convite
                     </Button>

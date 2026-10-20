@@ -10,6 +10,7 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGroup } from '@/hooks/useGroup'
 import { api } from '@/lib/api'
+import { parseGroupId } from '@/lib/invite'
 import { spotifySearch, ytmusicSearch } from '@/lib/musicbrainz'
 import type { GroupState } from '@/hooks/useGroup'
 import { cn } from '@/lib/utils'
@@ -93,7 +94,8 @@ export function Rounds({ data, refresh }: { data: GroupState; refresh?: () => vo
 }
 
 export default function GroupHistoryPage() {
-  const { id = '' } = useParams()
+  const { id: param = '' } = useParams()
+  const id = parseGroupId(param) ?? param
   const { state, refresh } = useGroup(id)
   if (state.status === 'loading') return <Skeleton className="mx-auto mt-24 h-64 max-w-md" />
   if (state.status === 'error') return <p className="mt-24 text-center text-destructive">{state.message}</p>
