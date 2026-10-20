@@ -10,7 +10,7 @@ web
 Groups of 2–6 friends who want a recurring ritual of listening to the same album and talking about it afterwards. They use it day to day, mostly from their phones, each person in their own place. One member is the group "leader" and drives each round; the others join through an invite link.
 
 ## Product Purpose
-Disco da Vez removes the "what do we listen to?" negotiation. Each person drops up to 5 artists or genres, and the group either spins a roulette (CS2-case style) or votes in secret on candidate albums. The result is one full album everyone listens to, discusses and discovers together. Success is the group actually finishing a round and listening, repeatedly.
+Disco da Vez removes the "what do we listen to?" negotiation. Each person drops up to 5 artists or genres, and the group either spins a roulette or votes in secret on candidate albums. The result is one full album everyone listens to, discusses and discovers together. Success is the group actually finishing a round and listening, repeatedly.
 
 ## Positioning
 The decision itself is the event: a shared roulette or a secret vote, not a playlist one person curates. It targets whole albums (MusicBrainz release-groups, remasters collapsed), not loose tracks. No sign-up: anonymous sign-in plus an invite link. The group has a memory: albums already heard ("Já ouvimos") never return.
