@@ -3,7 +3,6 @@ import { Volume2, VolumeX } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useMuted } from '@/lib/sound'
 import { GithubIcon } from './Brand'
-import { GroupsMenu } from './GroupsMenu'
 import { cn } from '@/lib/utils'
 
 
@@ -154,7 +153,6 @@ export function Masthead({ children }: { children?: React.ReactNode }) {
         <Logo />
       </Link>
       <div className="flex shrink-0 items-center gap-2">
-        <GroupsMenu />
         {children}
       </div>
     </div>

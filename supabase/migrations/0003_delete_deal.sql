@@ -1,11 +1,11 @@
 -- Excluir grupo/histórico e animação imediata (o líder "abre" o sorteio/votação antes de buscar os álbuns).
--- Rode no SQL Editor do Supabase (ou `supabase db push`) depois das migrações 0001 e 0002.
+-- Rode no SQL Editor do Supabase (ou `supabase db push`) depois das migrações 0001 e 0002. Pode rodar de novo sem erro.
 
 -- ---------------------------------------------------------------- animação imediata
 
 -- 1) o líder clica: a rodada entra em 'drawing' (sorteio) ou 'voting' (votação) ainda sem resultado, e todos veem a dinâmica começar;
 -- 2) publish_draw / publish_vote preenchem o resultado quando a busca termina. Também serve para "sortear de novo".
-create function begin_deal(rid uuid) returns void
+create or replace function begin_deal(rid uuid) returns void
 language plpgsql security definer set search_path = public as $$
 declare r rounds;
 begin
@@ -32,8 +32,8 @@ begin
 end $$;
 
 -- p_filler: capas só para a animação de revelação (fica em result até a votação fechar)
-drop function publish_vote(uuid, jsonb);
-create function publish_vote(rid uuid, p_candidates jsonb, p_filler jsonb default '[]') returns void
+drop function if exists publish_vote(uuid, jsonb);
+create or replace function publish_vote(rid uuid, p_candidates jsonb, p_filler jsonb default '[]') returns void
 language plpgsql security definer set search_path = public as $$
 declare r rounds;
 begin
@@ -89,14 +89,14 @@ end $$;
 
 -- ---------------------------------------------------------------- excluir (só o líder)
 
-create function delete_group(gid uuid) returns void
+create or replace function delete_group(gid uuid) returns void
 language plpgsql security definer set search_path = public as $$
 begin
   if not exists (select 1 from groups where id = gid and leader_id = _uid()) then raise exception 'forbidden'; end if;
   delete from groups where id = gid; -- membros, rodadas, votos e histórico saem em cascata
 end $$;
 
-create function delete_history_item(hid uuid) returns void
+create or replace function delete_history_item(hid uuid) returns void
 language plpgsql security definer set search_path = public as $$
 begin
   delete from history h using groups g
@@ -106,3 +106,6 @@ end $$;
 
 revoke execute on function begin_deal, publish_vote, delete_group, delete_history_item from public, anon;
 grant execute on function begin_deal, publish_vote, delete_group, delete_history_item to authenticated;
+
+-- a API (PostgREST) passa a enxergar as funções novas na hora
+notify pgrst, 'reload schema';

@@ -24,13 +24,19 @@ async function rpc<T = void>(fn: string, args: Record<string, unknown>): Promise
 
 export const api = {
   preview: async (gid: string) => {
-    const rows = await rpc<{ name: string; member_count: number; leader_name: string }[]>('group_preview', { gid })
+    const rows = await rpc<{ name: string; member_count: number; leader_name: string; is_leader?: boolean }[]>('group_preview', { gid })
     return rows[0] ?? null
   },
   createGroup: (name: string, leader: string) => rpc<string>('create_group', { p_name: name, p_leader_name: leader }),
   join: (gid: string, name: string) => rpc<string>('join_group', { gid, p_name: name }),
   touch: (gid: string) => rpc('touch_member', { gid }),
   removeMember: (mid: string) => rpc('remove_member', { mid }),
+  /** Sair do grupo sem estar na página dele: acha a própria linha de membro e remove. */
+  leaveGroup: async (gid: string) => {
+    const uid = await ensureSession()
+    const { data } = await supabase.from('members').select('id').eq('group_id', gid).eq('user_id', uid).maybeSingle()
+    if (data) await rpc('remove_member', { mid: data.id })
+  },
   transferLeadership: (gid: string, mid: string) => rpc('transfer_leadership', { gid, mid }),
   claimLeadership: (gid: string) => rpc('claim_leadership', { gid }),
   startRound: (gid: string, mode: Mode, kind: Kind) => rpc<string>('start_round', { gid, p_mode: mode, p_kind: kind }),

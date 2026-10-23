@@ -102,10 +102,9 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   const allReady = participants.length >= 2 && readyCount === participants.length
   const allVoted = participants.length > 0 && votedCount === participants.length
   const leaderMember = members.find((m) => m.user_id === group.leader_id)
-  // gerir o grupo só antes de escolher as bandas; no sorteio a seção some, e nas escolhas/votação vira só leitura
-  const manage = !active
-  // cada etapa é uma tela: as pessoas só aparecem antes e durante as escolhas; sorteio e votação ocupam a tela inteira
+  // cada etapa é uma tela: as pessoas (e a gestão do grupo) só aparecem antes e durante as escolhas; sorteio e votação ocupam a tela inteira
   const showPeople = !active || active.status === 'choosing'
+  const manage = showPeople
   const col2 = showPeople ? 'lg:col-start-2' : 'lg:col-start-1'
   // número da rodada (#1, #2…): a que está rolando, ou a próxima quando nada está rolando
   const total = rounds.length
