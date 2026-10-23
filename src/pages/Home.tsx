@@ -4,6 +4,7 @@ import { lazy, Suspense, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { BRAND, Masthead, SoundToggle, Footer } from '@/components/Guide'
+import { SavedGroups } from '@/components/SavedGroups'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -108,6 +109,7 @@ export default function Home() {
               <Card className="gap-3 rounded-none border-t-[6px] p-5">
                 {back('start')}
                 <h2 className="text-3xl">Jogar com amigos</h2>
+                <SavedGroups />
                 <Button size="lg" className="w-full hover:border-you hover:bg-you hover:text-you-ink" onClick={() => setView('create')}>
                   <Disc3 className="transition-transform duration-500 ease-out group-hover/button:rotate-180" /> Criar grupo
                 </Button>

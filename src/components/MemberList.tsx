@@ -15,7 +15,7 @@ interface Props {
   members: Member[]
   me: Member
   isLeader: boolean
-  /** Só antes da rodada começar: mostra o menu de liderança e remoção. */
+  /** Antes da rodada e durante as escolhas: mostra o menu de liderança e remoção. */
   manage: boolean
   /** Rodada ativa (ou null): define as colunas da grade. */
   active: Round | null

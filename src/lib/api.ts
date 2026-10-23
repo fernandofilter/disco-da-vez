@@ -24,7 +24,7 @@ async function rpc<T = void>(fn: string, args: Record<string, unknown>): Promise
 
 export const api = {
   preview: async (gid: string) => {
-    const rows = await rpc<{ name: string; member_count: number; leader_name: string }[]>('group_preview', { gid })
+    const rows = await rpc<{ name: string; member_count: number; leader_name: string; is_leader?: boolean }[]>('group_preview', { gid })
     return rows[0] ?? null
   },
   createGroup: (name: string, leader: string) => rpc<string>('create_group', { p_name: name, p_leader_name: leader }),
