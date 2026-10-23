@@ -27,3 +27,6 @@ dist-ssr
 .session-*.json
 
 .vercel
+
+# cache local do hook do Impeccable (por sessão, caminhos da máquina)
+.impeccable/hook.cache.json
