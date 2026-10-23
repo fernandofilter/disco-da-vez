@@ -35,7 +35,7 @@ Também há o **modo solo** (`/solo`), que sorteia um álbum sem precisar de gru
 - Sorteio com roleta animada e votação secreta, ambos em tempo real para todo o grupo.
 - Capas, faixas e lados do vinil vindos do MusicBrainz e do Cover Art Archive; remasters são agrupados no mesmo álbum.
 - Last.fm opcional como fonte extra de álbuns por gênero.
-- Papéis claros: o líder inicia rodadas, remove pessoas e passa a liderança; se ele some por 7 dias, outro membro pode assumir.
+- Papéis claros: o líder inicia rodadas, remove pessoas, passa a liderança e exclui o grupo; se ele some por 7 dias, outro membro pode assumir. A lista completa está em [`PRODUCT.md`](PRODUCT.md).
 - Histórico por grupo, links para Spotify e YouTube Music, e cache local de 14 dias para as buscas.
 - Pensado para celular (mobile-first), com toque e som opcional.
 
@@ -62,7 +62,7 @@ cp .env.example .env
 
 ### 1. Supabase
 
-1. No **SQL Editor**, rode as migrações de `supabase/migrations/` em ordem: `0001_init.sql`, `0002_album_mode.sql`, `0003_delete_deal.sql` e `0004_fresh_choices.sql`.
+1. No **SQL Editor**, rode as migrações de `supabase/migrations/` em ordem: `0001_init.sql`, `0002_album_mode.sql`, `0003_delete_deal.sql`, `0004_fresh_choices.sql` e `0005_preview_leader.sql`. Se aparecer "Could not find the function … in the schema cache", falta rodar alguma delas.
 2. Ative **Authentication → Providers → Anonymous sign-ins**.
 
 ### 2. Variáveis de ambiente

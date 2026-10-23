@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { Crown, MoreVertical, UserMinus } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
+import { forgetGroup } from '@/lib/groups'
 import type { Group, Member, Round, RoundChoice } from '@/lib/types'
 import { sfx } from '@/lib/sound'
 import { cn } from '@/lib/utils'
@@ -15,7 +17,7 @@ interface Props {
   members: Member[]
   me: Member
   isLeader: boolean
-  /** Só antes da rodada começar: mostra o menu de liderança e remoção. */
+  /** Antes da rodada e durante as escolhas: mostra o menu de liderança e remoção. */
   manage: boolean
   /** Rodada ativa (ou null): define as colunas da grade. */
   active: Round | null
@@ -33,6 +35,7 @@ const LABEL: Record<MarkState, string> = { done: 'feito', pending: 'aguardando',
 /** A grade: uma linha por pessoa (a sua é azul) e uma coluna por etapa, com o estado em forma de marca. */
 export function MemberList({ group, members, me, isLeader, manage, active, choices }: Props) {
   const [open, setOpen] = useState<string | null>(null)
+  const nav = useNavigate()
   const voting = active?.kind === 'vote'
   const cols = active ? [{ key: 'ready', label: 'Escolhas' }, ...(voting ? [{ key: 'voted', label: 'Voto' }] : [])] : []
 
@@ -98,7 +101,7 @@ export function MemberList({ group, members, me, isLeader, manage, active, choic
                         <Crown /> Passar liderança
                       </Button>
                     )}
-                    <Button variant="destructive" size="sm" onClick={() => { setOpen(null); api.removeMember(m.id).catch(fail) }}>
+                    <Button variant="destructive" size="sm" onClick={() => { setOpen(null); api.removeMember(m.id).then(() => { if (m.id === me.id) { forgetGroup(group.id); nav('/') } }, fail) }}>
                       <UserMinus /> {m.id === me.id ? 'Sair do grupo' : 'Remover'}
                     </Button>
                   </div>
