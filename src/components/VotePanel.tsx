@@ -19,9 +19,9 @@ const LOCK_STEP_MS = 480
 /**
  * Seis programas na grade; o voto é secreto até a rodada fechar e pode ser trocado. O escolhido inverte para tinta cheia.
  * Sem `candidates` a busca ainda está rolando (slots em espera). Quando eles chegam, cada slot troca de capa até travar no sorteado,
- * um depois do outro; `reveal=false` (modo Álbuns, ou quem abriu a tela depois) mostra tudo pronto.
+ * um depois do outro; `reveal=false` (modo Álbuns, ou quem abriu a tela depois) mostra tudo pronto. `watch`: quem entrou depois só assiste.
  */
-export function VotePanel({ roundId, candidates, myVote, filler = [], reveal = true }: { roundId: string; candidates: Album[] | null; myVote?: string; filler?: Album[]; reveal?: boolean }) {
+export function VotePanel({ roundId, candidates, myVote, filler = [], reveal = true, watch = false }: { roundId: string; candidates: Album[] | null; myVote?: string; filler?: Album[]; reveal?: boolean; watch?: boolean }) {
   const wasPending = useRef(!candidates)
   const run = wasPending.current && reveal
   const [locked, setLocked] = useState(candidates && !run ? candidates.length : 0)
@@ -67,7 +67,7 @@ export function VotePanel({ roundId, candidates, myVote, filler = [], reveal = t
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.06, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            disabled={!open || !done}
+            disabled={!open || !done || watch}
             onClick={() =>
               api.castVote(roundId, a!.id).then(
                 () => sfx.vote(),
@@ -80,7 +80,7 @@ export function VotePanel({ roundId, candidates, myVote, filler = [], reveal = t
             aria-pressed={picked}
             className={cn(
               'box flex flex-col gap-2 p-2 text-left transition-colors',
-              picked ? 'bg-foreground text-background' : done && 'hover:bg-muted',
+              picked ? 'bg-foreground text-background' : done && !watch && 'hover:bg-muted',
               !a && 'animate-pulse',
             )}
           >

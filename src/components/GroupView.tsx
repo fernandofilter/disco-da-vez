@@ -90,13 +90,23 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   const [busy, setBusy] = useState(false) // a busca dos álbuns está rolando (só no celular do líder)
   const nav = useNavigate()
   const [sure, setSure] = useState(false) // confirmação de excluir o grupo
+  const [undo, setUndo] = useState('') // confirmação de voltar às escolhas com a votação aberta (vale só para esta abertura: id/spin)
   const [rolls, setRolls] = useState(0)
   const closing = useRef(false)
   const seen = useRef(members.length)
 
   const active = round && round.status !== 'done' ? round : null
   const participants = members.filter((m) => active?.participants.includes(m.id))
+  // quem entrou com o sorteio/votação já rolando: assiste até o líder reabrir as escolhas
+  const late = active ? members.filter((m) => !active.participants.includes(m.id)) : []
   const myChoice = me && choices.find((c) => c.member_id === me.id)
+  const inRound = !!myChoice && !!active?.participants.includes(myChoice.member_id)
+  const lateNote = 'Você entrou em uma rodada em andamento: participa da próxima, ou quando o líder reabrir as escolhas.'
+  const lateWaiting = late.length > 0 && (
+    <p className="text-sm font-semibold">
+      {new Intl.ListFormat('pt-BR').format(late.map((m) => m.name))} {late.length === 1 ? 'entrou depois e está esperando' : 'entraram depois e estão esperando'}: volte às escolhas para incluir.
+    </p>
+  )
   const readyCount = participants.filter((m) => choices.find((c) => c.member_id === m.id)?.ready).length
   const votedCount = participants.filter((m) => choices.find((c) => c.member_id === m.id)?.voted).length
   const allReady = participants.length >= 2 && readyCount === participants.length
@@ -149,10 +159,9 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
   const what = active?.mode === 'artist' ? 'suas bandas' : active?.mode === 'album' ? 'seus álbuns' : 'seus gêneros'
   const next = !active
     ? isLeader ? `Inicie a rodada #${nextNo}` : 'Aguardando o líder'
+    : !inRound ? 'Você entra na próxima rodada'
     : active.status === 'choosing'
-      ? !(myChoice && active.participants.includes(me?.id ?? ''))
-        ? 'Você entra na próxima rodada'
-        : !myChoice.ready ? `Escolha ${what}`
+      ? !myChoice.ready ? `Escolha ${what}`
         : allReady ? (isLeader ? (active.kind === 'vote' ? 'Inicie a votação' : 'Sorteie o álbum') : 'Aguardando o líder')
         : `Aguardando ${participants.length - readyCount} ${participants.length - readyCount === 1 ? 'pessoa' : 'pessoas'}`
       : active.status === 'drawing' ? 'Sorteio no ar'
@@ -340,10 +349,10 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
           {/* ---------- escolhas */}
           {active?.status === 'choosing' && (
             <Section title={active.mode === 'artist' ? 'Escolha suas bandas/artistas' : active.mode === 'album' ? 'Escolha seus álbuns' : 'Escolha seus gêneros'} hint={`Rodada #${total} · ${active.kind === 'vote' ? 'Votação' : 'Sorteio'} · de 1 a 5 escolhas`}>
-              {myChoice && active.participants.includes(me.id) ? (
+              {myChoice && inRound ? (
                 <Card className="p-4"><ChoicePicker roundId={active.id} mode={active.mode} initial={myChoice.items} ready={myChoice.ready} /></Card>
               ) : (
-                <p className="text-muted-foreground">Você entrou com a rodada em andamento: participa da próxima.</p>
+                <p className="text-muted-foreground">{lateNote}</p>
               )}
               {isLeader && (
                 <Button size="lg" disabled={!allReady || busy} onClick={() => run(active)}>
@@ -356,15 +365,19 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
           {/* ---------- sorteio em andamento */}
           {active?.status === 'drawing' && (
             <Section title="Sorteio" hint={`Rodada #${total}`}>
+              {!inRound && <p className="text-muted-foreground">{lateNote}</p>}
               <Reveal round={active} album={active.result?.album} pool={active.result?.filler ?? []}>
                 {(rolled) =>
                   rolled && isLeader ? (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-3">
-                      <Button size="lg" className="w-full" onClick={() => api.confirmDraw(active.id).then(refresh, fail)}><CircleCheck /> Vamos ouvir esse</Button>
-                      <Button variant="outline" size="lg" className="w-full" disabled={busy} onClick={() => run(active)}>
-                        {busy ? <Loader2 className="animate-spin" /> : <RotateCcw />} Sortear de novo
-                      </Button>
-                      <Button variant="outline" size="lg" className="w-full" onClick={() => api.backToChoosing(active.id).then(refresh, fail)}><Undo2 /> Voltar às escolhas</Button>
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+                      {lateWaiting}
+                      <div className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-3">
+                        <Button size="lg" className="w-full" onClick={() => api.confirmDraw(active.id).then(refresh, fail)}><CircleCheck /> Vamos ouvir esse</Button>
+                        <Button variant="outline" size="lg" className="w-full" disabled={busy} onClick={() => run(active)}>
+                          {busy ? <Loader2 className="animate-spin" /> : <RotateCcw />} Sortear de novo
+                        </Button>
+                        <Button variant="outline" size="lg" className="w-full" onClick={() => api.backToChoosing(active.id).then(refresh, fail)}><Undo2 /> Voltar às escolhas</Button>
+                      </div>
                     </motion.div>
                   ) : rolled ? (
                     <p className="text-sm text-muted-foreground">Aguardando o líder confirmar ou sortear de novo…</p>
@@ -379,10 +392,25 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
           {/* ---------- votação */}
           {active?.status === 'voting' && (
             <Section title="Votação" hint={`Rodada #${total} · seu voto é secreto até todos votarem. Dá para trocar antes de encerrar.`}>
-              <VotePanel roundId={active.id} candidates={active.candidates} filler={(active.result as { filler?: Album[] } | null)?.filler} reveal={active.mode !== 'album'} myVote={votes.find((v) => v.member_id === me.id)?.album_id} />
+              {!inRound && <p className="text-muted-foreground">{lateNote}</p>}
+              <VotePanel roundId={active.id} candidates={active.candidates} filler={(active.result as { filler?: Album[] } | null)?.filler} reveal={active.mode !== 'album'} myVote={votes.find((v) => v.member_id === me.id)?.album_id} watch={!inRound} />
               {!active.candidates && stuck(active)}
               {isLeader && active.candidates && !allVoted && (
-                <Button variant="outline" onClick={() => api.closeVote(active.id).catch(fail)}><CircleCheck /> Encerrar votação agora</Button>
+                <div className="space-y-3">
+                  {lateWaiting}
+                  {undo === `${active.id}/${active.spin}` ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="w-full text-sm font-semibold">Voltar às escolhas? Os votos já dados serão apagados.</p>
+                      <Button variant="destructive" size="sm" onClick={() => api.backToChoosing(active.id).then(refresh, fail)}><Undo2 /> Sim, voltar às escolhas</Button>
+                      <Button variant="outline" size="sm" onClick={() => setUndo('')}>Cancelar</Button>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(13.5rem,1fr))] gap-3">
+                      <Button variant="outline" className="w-full" onClick={() => api.closeVote(active.id).catch(fail)}><CircleCheck /> Encerrar votação agora</Button>
+                      <Button variant="outline" className="w-full" onClick={() => setUndo(`${active.id}/${active.spin}`)}><Undo2 /> Voltar às escolhas</Button>
+                    </div>
+                  )}
+                </div>
               )}
             </Section>
           )}
