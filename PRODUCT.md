@@ -19,10 +19,11 @@ The decision itself is the event: a shared roulette or a secret vote, not a play
 - Rounds: leader picks mode (artists or genres) and kind (draw or vote); everyone picks 1–5 items and confirms; leader triggers the draw or vote (vote shows 6 candidates, ties are broken server-side, ballots are secret until everyone has voted).
 - Leader powers (enforced server-side; everyone else gets "forbidden"):
   - Start a round, choosing the kind (draw or vote) and the mode (artists, genres or albums).
-  - Trigger the draw or open the vote once everyone has confirmed; on the draw, accept the album, draw again or send everyone back to choosing; on the vote, close it early.
+  - Trigger the draw or open the vote once everyone has confirmed; on the draw, accept the album, draw again or send everyone back to choosing; on the vote, close it early or send everyone back to choosing (after a confirmation, since the ballots already cast are discarded). Going back to choosing keeps everyone's picks and confirmations and rebuilds the participants from whoever is in the group now, so people who joined mid-round get in; the leader sees a notice naming who is waiting.
   - Remove a person or pass leadership to someone (per-person menu in the people list). The leader cannot leave; pass leadership first.
   - Delete an album from the group history, freeing it to be drawn again.
   - Delete the group, with all rounds and history, for everyone: on the group page or from the "Seus grupos" list on the home screen (only rows where you lead show the delete button).
+- Joining mid-round: anyone who joins while the round is still in choosing becomes a participant right away; anyone who joins during the draw or the vote watches as a spectator until the leader goes back to choosing (or the next round).
 - Group management (people menu, invite link and code, delete group) is available before a round starts and during choosing; on the draw and vote screens the people section is hidden. Members who are not the leader can leave the group from their own row in the people list (back to the home screen) or from the "Seus grupos" list (exit button on rows they do not lead); they can rejoin through the invite link. A leader gone 7+ days can be claimed by another member.
 - Real-time group state via Supabase; albums and covers from MusicBrainz and Cover Art Archive; Last.fm is optional (an extra source of albums by genre).
 - Static SPA (Vite, React, Tailwind, shadcn), deployed on Vercel; `/demo` exists in dev only.
