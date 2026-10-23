@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import genres from '@/data/genres.json'
 import { api } from '@/lib/api'
-import { artistAlbums, hasCover, searchAlbums, searchArtists } from '@/lib/musicbrainz'
+import { artistAlbums, artistPhotos, hasCover, searchAlbums, searchArtists } from '@/lib/musicbrainz'
 import { sfx } from '@/lib/sound'
 import type { Choice, Mode } from '@/lib/types'
 import { AlbumIcon } from './Brand'
@@ -37,6 +37,7 @@ export function ChoicePicker({ roundId, mode, initial, ready, min = 1, onChange 
   const [query, setQuery] = useState('')
   const [found, setFound] = useState<Choice[]>([])
   const [searching, setSearching] = useState(false)
+  const [photos, setPhotos] = useState<Record<string, string>>({})
   const [locked, setLocked] = useState(ready)
   const itemsRef = useRef(items)
   itemsRef.current = items
@@ -57,6 +58,14 @@ export function ChoicePicker({ roundId, mode, initial, ready, min = 1, onChange 
     }, 450)
     return () => clearTimeout(t)
   }, [query, mode])
+
+  // as fotos chegam depois dos nomes: a lista aparece já e as imagens entram quando a Wikidata responder
+  useEffect(() => {
+    if (mode !== 'artist') return
+    let live = true
+    artistPhotos(found.map((f) => f.id)).then((p) => live && setPhotos((cur) => ({ ...cur, ...p })), () => {})
+    return () => { live = false }
+  }, [found, mode])
 
   const genreMatches = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -136,6 +145,11 @@ export function ChoicePicker({ roundId, mode, initial, ready, min = 1, onChange 
                 {options.map((o) => (
                   <CommandItem key={o.id} value={o.id} onSelect={() => add(o)}>
                     {mode === 'album' && <Cover album={{ id: o.id, title: o.name }} size={250} className="size-12 shrink-0" />}
+                    {mode === 'artist' && (
+                      <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden bg-muted ring-1 ring-foreground/25">
+                        {photos[o.id] ? <img src={photos[o.id]} alt="" loading="lazy" className="size-full object-cover" /> : <Mic className="size-5 opacity-50" aria-hidden />}
+                      </span>
+                    )}
                     <span className="max-w-[60%] shrink-0 truncate">{o.name}</span>
                     {o.sub && <span className="ml-2 min-w-0 truncate text-xs opacity-70">{o.sub}{o.year ? ` · ${o.year}` : ''}</span>}
                   </CommandItem>

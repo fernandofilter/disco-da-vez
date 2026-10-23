@@ -85,6 +85,16 @@ export async function searchArtists(q: string): Promise<Choice[]> {
   return r.artists.filter((a) => (a.score ?? 100) >= 60).map((a) => ({ id: a.id, name: a.name, sub: [a.disambiguation, a.country].filter(Boolean).join(' · ') || undefined }))
 }
 
+/** Foto de cada artista (MBID → URL de miniatura), da Wikidata (propriedade P18), numa consulta só. Quem não tem foto fica de fora. */
+export async function artistPhotos(ids: string[]): Promise<Record<string, string>> {
+  if (!ids.length) return {}
+  const query = `SELECT ?m ?img WHERE { VALUES ?m { ${ids.map((i) => `"${i}"`).join(' ')} } ?a wdt:P434 ?m; wdt:P18 ?img }`
+  const r = await fetch(`https://query.wikidata.org/sparql?${new URLSearchParams({ format: 'json', query })}`)
+  if (!r.ok) throw new Error(`Wikidata ${r.status}`)
+  const j = (await r.json()) as { results: { bindings: { m: { value: string }; img: { value: string } }[] } }
+  return Object.fromEntries(j.results.bindings.map((b) => [b.m.value, `${b.img.value.replace(/^http:/, 'https:')}?width=120`]))
+}
+
 /** Busca de álbum por título ou artista; o resultado já carrega título, artista e ano. */
 export async function searchAlbums(q: string): Promise<Choice[]> {
   const t = lucene(q)
