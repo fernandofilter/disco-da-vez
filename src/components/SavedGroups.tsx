@@ -1,4 +1,4 @@
-import { ChevronRight, Trash2 } from 'lucide-react'
+import { ChevronRight, LogOut, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
@@ -14,7 +14,7 @@ type Row = { id: string; name: string; members: number | null; leader?: boolean 
 /** Grupos que este aparelho já abriu, com a quantidade de membros de cada um. Sem grupos, não desenha nada. */
 export function SavedGroups() {
   const [rows, setRows] = useState<Row[]>(() => savedGroups().map((g) => ({ ...g, members: null })))
-  const [asking, setAsking] = useState<string | null>(null) // confirmação de excluir
+  const [asking, setAsking] = useState<string | null>(null) // confirmação de excluir (líder) ou sair (demais)
 
   useEffect(() => {
     // contagem vem do servidor; grupo que não existe mais (excluído) sai da lista
@@ -31,11 +31,11 @@ export function SavedGroups() {
 
   function remove(g: Row) {
     setAsking(null)
-    api.deleteGroup(g.id).then(
+    ;(g.leader ? api.deleteGroup(g.id) : api.leaveGroup(g.id)).then(
       () => {
         forgetGroup(g.id)
         setRows((cur) => cur.filter((r) => r.id !== g.id))
-        toast.success(`“${g.name}” excluído`)
+        toast.success(g.leader ? `“${g.name}” excluído` : `Você saiu de “${g.name}”`)
       },
       (e: Error) => {
         sfx.error()
@@ -52,9 +52,9 @@ export function SavedGroups() {
         {rows.map((g) =>
           asking === g.id ? (
             <li key={g.id} className="space-y-2 bg-card px-4 py-3">
-              <p className="text-sm font-semibold">Apagar “{g.name}” e todo o histórico, para todos?</p>
+              <p className="text-sm font-semibold">{g.leader ? `Apagar “${g.name}” e todo o histórico, para todos?` : `Sair de “${g.name}”? Dá para voltar pelo link de convite.`}</p>
               <div className="flex flex-wrap gap-2">
-                <Button variant="destructive" size="sm" onClick={() => remove(g)}><Trash2 /> Sim, excluir grupo</Button>
+                <Button variant="destructive" size="sm" onClick={() => remove(g)}>{g.leader ? <><Trash2 /> Sim, excluir grupo</> : <><LogOut /> Sim, sair do grupo</>}</Button>
                 <Button variant="outline" size="sm" onClick={() => setAsking(null)}>Cancelar</Button>
               </div>
             </li>
@@ -65,10 +65,10 @@ export function SavedGroups() {
                 {g.members === null ? <Skeleton className="h-4 w-16" /> : g.members < 0 ? null : <span className="tnum shrink-0 text-sm font-medium text-muted-foreground group-hover/row:text-you-ink">{g.members} {g.members === 1 ? 'membro' : 'membros'}</span>}
                 <ChevronRight aria-hidden className="size-5 shrink-0 transition-transform duration-300 ease-out group-hover/row:translate-x-0.5" />
               </Link>
-              {/* só o líder exclui; quem não é líder sai do grupo pela lista de pessoas */}
-              {g.leader && (
-                <button type="button" aria-label={`Excluir ${g.name}`} title="Excluir grupo" className="flex w-11 shrink-0 items-center justify-center border-l border-foreground/20 bg-card transition-colors hover:bg-muted" onClick={() => setAsking(g.id)}>
-                  <Trash2 className="size-5" />
+              {/* o líder exclui; os demais saem (o líder precisa passar a liderança antes de sair). Sem a migração 0005, leader vem undefined e nada aparece */}
+              {g.leader !== undefined && (
+                <button type="button" aria-label={g.leader ? `Excluir ${g.name}` : `Sair de ${g.name}`} title={g.leader ? 'Excluir grupo' : 'Sair do grupo'} className="flex w-11 shrink-0 items-center justify-center border-l border-foreground/20 bg-card transition-colors hover:bg-muted" onClick={() => setAsking(g.id)}>
+                  {g.leader ? <Trash2 className="size-5" /> : <LogOut className="size-5" />}
                 </button>
               )}
             </li>

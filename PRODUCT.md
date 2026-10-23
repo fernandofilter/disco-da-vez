@@ -23,7 +23,7 @@ The decision itself is the event: a shared roulette or a secret vote, not a play
   - Remove a person or pass leadership to someone (per-person menu in the people list). The leader cannot leave; pass leadership first.
   - Delete an album from the group history, freeing it to be drawn again.
   - Delete the group, with all rounds and history, for everyone: on the group page or from the "Seus grupos" list on the home screen (only rows where you lead show the delete button).
-- Group management (people menu, invite link and code, delete group) is available before a round starts and during choosing; on the draw and vote screens the people section is hidden. Members who are not the leader can leave the group from the same menu, and a leader gone 7+ days can be claimed by another member.
+- Group management (people menu, invite link and code, delete group) is available before a round starts and during choosing; on the draw and vote screens the people section is hidden. Members who are not the leader can leave the group from their own row in the people list (back to the home screen) or from the "Seus grupos" list (exit button on rows they do not lead); they can rejoin through the invite link. A leader gone 7+ days can be claimed by another member.
 - Real-time group state via Supabase; albums and covers from MusicBrainz and Cover Art Archive; Last.fm is optional (an extra source of albums by genre).
 - Static SPA (Vite, React, Tailwind, shadcn), deployed on Vercel; `/demo` exists in dev only.
 - Interface copy is in Brazilian Portuguese (observed in the existing code).
