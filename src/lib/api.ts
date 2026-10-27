@@ -50,4 +50,6 @@ export const api = {
   closeVote: (rid: string) => rpc('close_vote', { rid }),
   deleteGroup: (gid: string) => rpc('delete_group', { gid }),
   deleteHistoryItem: (hid: string) => rpc('delete_history_item', { hid }),
+  savePush: (gid: string, endpoint: string, p256dh: string, auth: string) => rpc('save_push', { gid, p_endpoint: endpoint, p_p256dh: p256dh, p_auth: auth }),
+  deletePush: (gid: string, endpoint: string) => rpc('delete_push', { gid, p_endpoint: endpoint }),
 }

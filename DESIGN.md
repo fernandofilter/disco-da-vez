@@ -289,3 +289,10 @@ Discographies, album details, vinyl sides, genre counts and cover checks are cac
 
 ## Addendum: roulette tape
 The tape is built by `buildTape` (`src/lib/draw.ts`): up to 60 distinct covers drawn from the picks of everyone (14 per choice), shuffled in a bag, no cover repeated within the last 4 slots, and the winner is part of the same bag, so it also scrolls by at other points (never next to the stopping slot). There is no repeating cycle and no outsider that gives the winner away. Tie roulettes alternate only the tied albums.
+
+## Addendum: phone notifications (the bell)
+- **Bell toggle:** in the group masthead, between "Histórico" and the sound toggle: 44px tall, 1.5px ink border, BellOff on card fill when off, Bell on solid ink (inverted, like an ink button) when on; the "Avisos" label shows from `sm` up, icon only on phones. Fixed aria-label "Avisos no celular", aria-pressed carries the state. It is per device and per group, and hidden when the browser has no Web Push or the project has no VAPID key. On an iPhone in Safari it stays visible and a toast explains "Adicionar à Tela de Início" (iOS only delivers web push to Home Screen apps).
+- **Notification copy:** title is the group name; the body is one sentence in pt-BR about the step ("Rodada #N aberta: escolha suas bandas para o sorteio.", "Todo mundo escolheu: pode girar a roleta." (leader only), "A roleta parou: <álbum>, de <artista>.", "Votação aberta: …", "Votação encerrada: deu …", "Disco da vez: vamos ouvir …"). One tag per group, so each step replaces the previous one instead of piling up. Whoever triggered the step is not notified; a person looking at that group right now gets it silently closed.
+
+## Addendum: listen buttons
+- "Ouvir no Spotify" and "YouTube Music" (album card and history) open the album's own page in the app when it is known (MusicBrainz link, else Odesli from the iTunes match); otherwise they open the app's search for the album title and artist name. This is a fixed rule: see PRODUCT.md, "Listen links".

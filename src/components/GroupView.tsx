@@ -17,6 +17,7 @@ import type { MarkState } from './Guide'
 import { forgetGroup } from '@/lib/groups'
 import { inviteMessage } from '@/lib/invite'
 import { MemberList } from './MemberList'
+import { PushToggle } from './PushToggle'
 import { albumDetails, albumSides, artistAlbums } from '@/lib/musicbrainz'
 import { previews } from '@/lib/preview'
 import { Garimpo } from './Garimpo'
@@ -147,13 +148,14 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
     seen.current = members.length
   }, [members.length])
 
-  // todos votaram: o líder encerra sozinho (o servidor sorteia o desempate)
+  // todos votaram: encerra sozinho (o servidor sorteia o desempate). O líder encerra; quem votou também, para a votação
+  // não ficar parada esperando um líder que fechou o navegador (o primeiro fecha, os outros recebem round_locked e ignoram)
   useEffect(() => {
-    if (isLeader && active?.status === 'voting' && allVoted && !closing.current) {
+    if ((isLeader || inRound) && active?.status === 'voting' && active.candidates && allVoted && !closing.current) {
       closing.current = true
-      api.closeVote(active.id).catch(fail).finally(() => (closing.current = false))
+      api.closeVote(active.id).catch(isLeader ? fail : () => {}).finally(() => (closing.current = false))
     }
-  }, [isLeader, active?.status, active?.id, allVoted])
+  }, [isLeader, inRound, active?.status, active?.id, active?.candidates, allVoted])
 
   // o próximo passo de quem está olhando, em uma linha só
   const what = active?.mode === 'artist' ? 'suas bandas' : active?.mode === 'album' ? 'seus álbuns' : 'seus gêneros'
@@ -244,6 +246,7 @@ export function GroupView({ data, refresh }: { data: GroupState; refresh: () => 
             <span className="hidden sm:inline">Histórico</span>
             {history.length > 0 && <span className="tnum hidden sm:inline">({history.length})</span>}
           </Link>
+          {me && <PushToggle gid={group.id} memberId={me.id} />}
           <SoundToggle />
         </div>
       </Masthead>

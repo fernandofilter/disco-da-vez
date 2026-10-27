@@ -10,12 +10,33 @@ interface ItunesRow {
   trackName?: string
   trackNumber?: number
   previewUrl?: string
+  collectionViewUrl?: string
 }
 
 const itunes = async (path: string, params: Record<string, string | number>): Promise<ItunesRow[]> => {
   const r = await fetch(`https://itunes.apple.com/${path}?${new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)]))}`)
   if (!r.ok) throw new Error(`iTunes ${r.status}`)
   return (await r.json()).results ?? []
+}
+
+const albums = new Map<string, Promise<ItunesRow | null>>()
+
+/** O álbum no catálogo do iTunes, casado pelo título e pelo artista; null quando não está lá. */
+export function itunesAlbum(album: Album): Promise<ItunesRow | null> {
+  let p = albums.get(album.id)
+  if (!p) {
+    p = (async () => {
+      const want = normalizeTitle(album.title)
+      const artist = album.artist.toLowerCase().split(' & ')[0]
+      const find = (rows: ItunesRow[]) => rows.find((a) => normalizeTitle(a.collectionName ?? '') === want && (a.artistName ?? '').toLowerCase().includes(artist))
+      const search = (term: string, limit: number) => itunes('search', { term, media: 'music', entity: 'album', limit })
+      // a busca combinada erra em títulos curtos ou genéricos; se falhar, olha o catálogo do artista
+      return find(await search(`${album.artist} ${album.title}`, 10)) ?? find(await search(album.artist, 50)) ?? null
+    })()
+    p.catch(() => albums.delete(album.id))
+    albums.set(album.id, p)
+  }
+  return p
 }
 
 const cache = new Map<string, Promise<(tracks: AlbumDetails['tracks']) => Record<number, string>>>()
@@ -25,12 +46,7 @@ export function previews(album: Album): Promise<(tracks: AlbumDetails['tracks'])
   let p = cache.get(album.id)
   if (!p) {
     p = (async () => {
-      const want = normalizeTitle(album.title)
-      const artist = album.artist.toLowerCase().split(' & ')[0]
-      const find = (rows: ItunesRow[]) => rows.find((a) => normalizeTitle(a.collectionName ?? '') === want && (a.artistName ?? '').toLowerCase().includes(artist))
-      const search = (term: string, limit: number) => itunes('search', { term, media: 'music', entity: 'album', limit })
-      // a busca combinada erra em títulos curtos ou genéricos; se falhar, olha o catálogo do artista
-      const hit = find(await search(`${album.artist} ${album.title}`, 10)) ?? find(await search(album.artist, 50))
+      const hit = await itunesAlbum(album)
       if (!hit?.collectionId) return () => ({})
       const songs = (await itunes('lookup', { id: hit.collectionId, entity: 'song' })).filter((s) => s.wrapperType === 'track' && s.previewUrl)
       const byName = new Map(songs.map((s) => [trackKey(s.trackName ?? ''), s.previewUrl as string]))

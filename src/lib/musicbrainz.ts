@@ -168,9 +168,6 @@ async function checkCover(id: string): Promise<boolean> {
   return Boolean(j.images?.some((i) => i.front))
 }
 
-export const spotifySearch = (a: Album) => `https://open.spotify.com/search/${encodeURIComponent(`${a.artist} ${a.title}`)}/albums`
-export const ytmusicSearch = (a: Album) => `https://music.youtube.com/search?q=${encodeURIComponent(`${a.artist} ${a.title}`)}`
-
 const details = new Map<string, Promise<AlbumDetails>>()
 
 const VIDEO_DISC = /blu-?ray|dvd|video|vhs|laserdisc/i
@@ -202,8 +199,10 @@ export function albumDetails(id: string): Promise<AlbumDetails> {
     out.totalMs = out.tracks.reduce((s, t) => s + (t.ms ?? 0), 0)
     out.label = rel['label-info']?.find((l) => l.label)?.label?.name
     for (const { url } of rel.relations ?? []) {
-      if (url?.resource.includes('open.spotify.com/album')) out.links.spotify ??= url.resource
-      if (url?.resource.includes('music.youtube.com')) out.links.ytmusic ??= url.resource
+      const u = url?.resource ?? ''
+      if (u.includes('open.spotify.com/album')) out.links.spotify ??= u
+      // só página de álbum (playlist OLAK… ou browse/MPREb…): canal de artista não serve
+      if (/music\.youtube\.com\/(playlist\?list=|browse\/MPREb)/.test(u)) out.links.ytmusic ??= u
     }
     return out
   })

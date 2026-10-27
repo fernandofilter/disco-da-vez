@@ -1,7 +1,8 @@
 import { motion } from 'motion/react'
 import { ExternalLink, Pause, Play } from 'lucide-react'
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { albumDetails, albumSides, spotifySearch, trackKey, ytmusicSearch } from '@/lib/musicbrainz'
+import { useListenLinks } from '@/hooks/useListenLinks'
+import { albumDetails, albumSides, trackKey } from '@/lib/musicbrainz'
 import { previews } from '@/lib/preview'
 import type { Album, AlbumDetails } from '@/lib/types'
 import { Badge } from './ui/badge'
@@ -37,6 +38,7 @@ export function AlbumCard({ album }: { album: Album }) {
   const [clipsChecked, setClipsChecked] = useState(false) // a busca das prévias terminou (com ou sem resultado)
   const [playing, setPlaying] = useState<number | null>(null)
   const audio = useRef<HTMLAudioElement>(null)
+  const listen = useListenLinks(album, d?.links)
 
   useEffect(() => {
     setD(null)
@@ -102,10 +104,10 @@ export function AlbumCard({ album }: { album: Album }) {
             !failed && <Skeleton className="h-7 w-48" />
           )}
           <div className="flex flex-wrap gap-2 md:mt-auto">
-            <Button size="lg" nativeButton={false} render={<a href={d?.links.spotify ?? spotifySearch(album)} target="_blank" rel="noreferrer" />}>
+            <Button size="lg" nativeButton={false} render={<a href={listen.spotify} target="_blank" rel="noreferrer" />}>
               <SpotifyIcon /> Ouvir no Spotify <ExternalLink className="opacity-70" />
             </Button>
-            <Button size="lg" variant="outline" nativeButton={false} render={<a href={d?.links.ytmusic ?? ytmusicSearch(album)} target="_blank" rel="noreferrer" />}>
+            <Button size="lg" variant="outline" nativeButton={false} render={<a href={listen.ytmusic} target="_blank" rel="noreferrer" />}>
               <YtMusicIcon /> YouTube Music <ExternalLink className="opacity-70" />
             </Button>
           </div>
