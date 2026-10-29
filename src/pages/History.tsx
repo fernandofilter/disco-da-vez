@@ -11,9 +11,25 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useGroup } from '@/hooks/useGroup'
 import { api } from '@/lib/api'
 import { parseGroupId } from '@/lib/invite'
-import { spotifySearch, ytmusicSearch } from '@/lib/musicbrainz'
+import { useListenLinks } from '@/hooks/useListenLinks'
 import type { GroupState } from '@/hooks/useGroup'
+import type { Album } from '@/lib/types'
 import { cn } from '@/lib/utils'
+
+/** Spotify e YouTube Music de um item: a página do álbum quando achada, senão a busca pelo título e pelo artista. */
+function Listen({ album }: { album: Album }) {
+  const links = useListenLinks(album)
+  return (
+    <>
+      <a href={links.spotify} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}>
+        <SpotifyIcon className="size-4" /> Spotify
+      </a>
+      <a href={links.ytmusic} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}>
+        <YtMusicIcon className="size-4" /> YouTube Music
+      </a>
+    </>
+  )
+}
 
 const when = (iso: string) => new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -67,12 +83,7 @@ export function Rounds({ data, refresh }: { data: GroupState; refresh?: () => vo
                   </span>
                 </p>
                 <div className="grid grid-cols-[repeat(auto-fit,minmax(9.5rem,1fr))] gap-2 pt-2">
-                  <a href={spotifySearch(h.album)} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}>
-                    <SpotifyIcon className="size-4" /> Spotify
-                  </a>
-                  <a href={ytmusicSearch(h.album)} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'outline', size: 'sm' }), 'w-full')}>
-                    <YtMusicIcon className="size-4" /> YouTube Music
-                  </a>
+                  <Listen album={h.album} />
                   {isLeader &&
                     (asking === h.id ? (
                       <>
